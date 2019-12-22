@@ -41,11 +41,12 @@ void ArduinoRedBoard::loop() const
                 (boardState[pin][0] == "INPUT_PULLDOWN_16"))
             {
                 int digitalPinValue = digitalRead(pin);
-                float analogPinValue = analogRead(pin); ////todo: analogRead()?
+                uint16_t analogPinValue = analogRead(pin); ////todo: analogRead()? (0 to 4095)
 
                 String jsonPinValueString;
                 StaticJsonDocument<300> pinValueDoc;
                 String jsonDHTString;
+
                 pinValueDoc["#"] = pin;
                 ////pinValueDoc["mode"] = boardState[pin][0];
                 ////pinValueDoc["state"] = boardState[pin][1];
@@ -53,6 +54,7 @@ void ArduinoRedBoard::loop() const
                 pinValueDoc["analog"] = analogPinValue;
 
                 serializeJson(pinValueDoc, jsonPinValueString);
+
                 if (jsonPinValueString.length() > 80)
                     Debug("jsonPinValueString is to big for mqtt msg > 80");
                 else
