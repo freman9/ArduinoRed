@@ -59,3 +59,65 @@ void loop()
   arduinoRed.loop();
   
 }
+
+
+Node-Red
+--------
+The ESP devices needs to get the mqttbroker paramters from node-red,
+
+instructions:
+create "http in" node with url "/getArduinoRedConfiguration"
+and respond with json object:
+
+"{
+  "server":
+    {
+      "url":"mqtt broker url",
+     "port":mqtt port,
+     "user":"mqtt user",
+     "password":"mqtt password"
+     },
+  "dht":
+    {
+      "refreshLag":5,         //dht refresh time in seconds
+      "diffTemperature":0.2,  //min delta temperature to update thermostat data
+      "diffHumidity":0.5      //min delta humidity to update thermostat data
+    },
+   "topics":                  //optional - you can define multiple topics for th ESP to subscribe
+      [{"topic":"test","qos":1,"subscribe":true}],
+   "client":
+   {
+    "name":"ESP32D1"
+   }
+ }"
+ 
+the device name should match the one typed in the main.cpp.
+send the json object to "http response" node.
+
+Device status
+-------------
+recive device status on topic ["device name"/status]
+send device status quary to topic ["device name"/status] payload ["sync"]
+
+Device debug
+-------------
+control debug messages broadcasting by sending ["startDebug"] or ["stopDebug"] to topic ["device name"/status]
+recive debug messages on ["device name"/debug]
+
+DHT
+---
+recive dht data as json object on topic ["device name"/thermostat/status]
+
+IR
+--
+recive IR reciver data on topic ["device name"/remote/recivedCode]
+send IR command (prontocode style as string) to topic ["device name"/remote/transmitCode]
+change mode (learn/normal) by sending ["mode:learn"] or ["mode:normal"] to topic ["device name"/remote]
+
+Control the board
+-----------------
+send json object to control the board to topic ["device name"/board]
+i.e. msg.payload={"pin":12,"state":"LOW","mode":"OUTPUT"}
+// state: "LOW"/"HIGH"
+// mode: "INPUT"/"OUTPUT"/"INPUT_PULLUP"/"INPUT_PULLUP_16"
+
