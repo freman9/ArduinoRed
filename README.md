@@ -65,6 +65,8 @@ Node-Red
 --------
 The ESP devices needs to get the mqttbroker paramters from node-red,
 
+(you have to set node-red before turning on the ESP)
+
 instructions:
 
 create "http in" node with url "/getArduinoRedConfiguration"
