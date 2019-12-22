@@ -158,3 +158,4 @@ i.e. msg.payload={"pin":12,"state":"LOW","mode":"OUTPUT"}
 
 //mode: "INPUT"/"OUTPUT"/"INPUT_PULLUP"/"INPUT_PULLUP_16"
 
+subscribe to topic ["device name"/board/pinValues] to get digital pins value (which youpreviously set to input)
