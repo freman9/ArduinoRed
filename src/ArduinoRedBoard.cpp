@@ -47,14 +47,16 @@ void ArduinoRedBoard::loop() const
                 StaticJsonDocument<300> pinValueDoc;
                 String jsonDHTString;
                 pinValueDoc["#"] = pin;
-                pinValueDoc["mode"] = boardState[pin][0];
-                pinValueDoc["state"] = boardState[pin][1];
+                ////pinValueDoc["mode"] = boardState[pin][0];
+                ////pinValueDoc["state"] = boardState[pin][1];
                 pinValueDoc["digital"] = digitalPinValue;
                 pinValueDoc["analog"] = analogPinValue;
 
                 serializeJson(pinValueDoc, jsonPinValueString);
-
-                mqttPublishCallback(topicBoardPinValues.c_str(), jsonPinValueString.c_str());
+                if (jsonPinValueString.length() > 80)
+                    Debug("jsonPinValueString is to big for mqtt msg > 80");
+                else
+                    mqttPublishCallback(topicBoardPinValues.c_str(), jsonPinValueString.c_str());
             }
         }
     }
