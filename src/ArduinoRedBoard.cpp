@@ -13,10 +13,10 @@ ArduinoRedBoard::ArduinoRedBoard()
     lastBoardStateRefresh = 0;
     boardStateRefreshLag_sec = 5;
 
-    for (uint16_t i = 0; i < numberOfPins; i++) //initialize boardState array
+    for (uint16_t pin = 0; pin < numberOfPins; pin++) //initialize boardState array
     {
-        boardState[i][0] = "null";
-        boardState[i][1] = "null";
+        boardState[pin][0] = "null";
+        boardState[pin][1] = "null";
     }
 }
 
@@ -33,22 +33,22 @@ void ArduinoRedBoard::loop() const
     {
         lastBoardStateRefresh = now;
 
-        for (uint16_t i = 0; i < numberOfPins; i++)
+        for (uint16_t pin = 0; pin < numberOfPins; pin++)
         {
-            if ((boardState[i][0] == "INPUT") ||
-                (boardState[i][0] == "INPUT_PULLUP") ||
-                (boardState[i][0] == "INPUT_PULLDOWN") ||
-                (boardState[i][0] == "INPUT_PULLDOWN_16"))
+            if ((boardState[pin][0] == "INPUT") ||
+                (boardState[pin][0] == "INPUT_PULLUP") ||
+                (boardState[pin][0] == "INPUT_PULLDOWN") ||
+                (boardState[pin][0] == "INPUT_PULLDOWN_16"))
             {
-                int digitalPinValue = digitalRead(i);
-                float analogPinValue = analogRead(i); ////todo: analogRead()?
+                int digitalPinValue = digitalRead(pin);
+                float analogPinValue = analogRead(pin); ////todo: analogRead()?
 
                 String jsonPinValueString;
                 StaticJsonDocument<300> pinValueDoc;
                 String jsonDHTString;
-                pinValueDoc["#"] = i;
-                pinValueDoc["mode"] = boardState[i][0];
-                pinValueDoc["state"] = boardState[i][1];
+                pinValueDoc["#"] = pin;
+                pinValueDoc["mode"] = boardState[pin][0];
+                pinValueDoc["state"] = boardState[pin][1];
                 pinValueDoc["digital"] = digitalPinValue;
                 pinValueDoc["analog"] = analogPinValue;
 
