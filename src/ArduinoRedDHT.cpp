@@ -16,7 +16,7 @@ ArduinoRedDHT::ArduinoRedDHT()
     oldHumidity = 0;
     diffTemperature = 0.2;
     diffHumidity = 0.5;
-    DHTRefreshLag = 5; // [sec]
+    DHTRefreshLag_sec = 5;
 }
 
 void ArduinoRedDHT::setup()
@@ -25,7 +25,7 @@ void ArduinoRedDHT::setup()
 
     setDHTConfig();
     dht.setup(DHTPin, DHTesp::DHTTYPE);
-    Debug("DHT config: DHTRefreshLag: " + String(DHTRefreshLag) +
+    Debug("DHT config: DHTRefreshLag_sec: " + String(DHTRefreshLag_sec) +
           " diffTemperature: " + String(diffTemperature) +
           " diffHumidity: " + String(diffHumidity));
 }
@@ -33,7 +33,7 @@ void ArduinoRedDHT::setup()
 void ArduinoRedDHT::loop()
 {
     long now = millis();
-    if (now - lastDhtRefresh > DHTRefreshLag * 1000)
+    if (now - lastDhtRefresh > DHTRefreshLag_sec * 1000)
     {
         lastDhtRefresh = now;
         RefreshDHT();
@@ -42,7 +42,7 @@ void ArduinoRedDHT::loop()
 
 void ArduinoRedDHT::setDHTConfig()
 {
-    DHTRefreshLag = atoi(getClientConfigurationDocCallback("dht", "refreshLag").c_str());
+    DHTRefreshLag_sec = atoi(getClientConfigurationDocCallback("dht", "refreshLag").c_str());
     diffTemperature = atof(getClientConfigurationDocCallback("dht", "diffTemperature").c_str());
     diffHumidity = atof(getClientConfigurationDocCallback("dht", "diffHumidity").c_str());
 }
@@ -68,9 +68,8 @@ void ArduinoRedDHT::RefreshDHT()
     float temperature = newValues.temperature;
     float humidity = newValues.humidity;
 
-    if (dhtNetworkSaver)
-        if ((abs(temperature - oldTemperature) < diffTemperature) && (abs(humidity - oldHumidity) < diffHumidity))
-            return;
+    if ((abs(temperature - oldTemperature) < diffTemperature) && (abs(humidity - oldHumidity) < diffHumidity))
+        return;
 
     oldTemperature = temperature;
     oldHumidity = humidity;

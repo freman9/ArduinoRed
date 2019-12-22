@@ -11,12 +11,10 @@ private:
 #define DHTTYPE DHT22
     DHTesp dht;
 
-    const boolean dhtNetworkSaver = true;
-
     long lastDhtRefresh;
     float oldTemperature, oldHumidity;
     float diffTemperature, diffHumidity;
-    int DHTRefreshLag;
+    int DHTRefreshLag_sec;
 
     String topicThermostat;
 

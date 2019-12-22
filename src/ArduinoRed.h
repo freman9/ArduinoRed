@@ -54,6 +54,10 @@ public:
                 ArduinoRedMqttClient::getEspMemStatusCallback = [this]() { ArduinoRed::getEspMemStatus(); };
                 ArduinoRedMqttClient::setup();
 
+                ArduinoRedBoard::mqttPublishCallback = [this](const char *topic, const char *payload) { ArduinoRedMqttClient::mqttPublish(topic, payload); };
+                ArduinoRedBoard::getClientConfigurationDocCallback = [this](String first, String second) { return ArduinoRedMqttClient::getClientConfigurationDoc(first, second); };
+                ArduinoRedBoard::setup();
+
 #ifdef DHTfunctionality
                 ArduinoRedDHT::mqttPublishCallback = [this](const char *topic, const char *payload) { ArduinoRedMqttClient::mqttPublish(topic, payload); };
                 ArduinoRedDHT::getClientConfigurationDocCallback = [this](String first, String second) { return ArduinoRedMqttClient::getClientConfigurationDoc(first, second); };
@@ -85,6 +89,9 @@ public:
                 ArduinoRedNtp::loop();
 
                 ArduinoRedMqttClient::loop();
+
+                ArduinoRedBoard::loop();
+
 #ifdef DHTfunctionality
                 ArduinoRedDHT::loop();
 #endif

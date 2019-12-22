@@ -124,11 +124,18 @@ void ArduinoRedMqttClient::pubSubClientCallback(char *topic, uint8_t *payload, u
     for (unsigned int i = 0; i < length; i++)
         payloadStr += (char)payload[i];
 
-    if (strcmp(topic, topicDebug.c_str()) != 0)
-        if (strcmp(topic, topicRemoteTransmitCode.c_str()) != 0)
-            Debug("[mqtt] topic: " + String(topic) + ", payload: " + payloadStr);
+    boolean filteredTopic = false;
+    if (strcmp(topic, topicDebug.c_str()) == 0) //filter debug of topicDebug messages
+        filteredTopic = true;
+    if (strcmp(topic, topicRemoteTransmitCode.c_str()) == 0) //filter debug of topicRemoteTransmitCode messages
+        filteredTopic = true;
+    if (strcmp(topic, topicBoard.c_str()) == 0) //filter debug of topicBoard messages
+        filteredTopic = true;
 
-    //status, debug & rest
+    if (!filteredTopic)
+        Debug("[mqtt] topic: " + String(topic) + ", payload: " + payloadStr);
+
+    //status, debug & reset
     if (strcmp(topic, topicStatus.c_str()) == 0)
     {
         if (strcmp(payloadStr.c_str(), "sync") == 0)
@@ -153,10 +160,11 @@ void ArduinoRedMqttClient::pubSubClientCallback(char *topic, uint8_t *payload, u
         }
     }
 
-    //Board
+    //board
     if (strcmp(topic, topicBoard.c_str()) == 0)
         boardCommandCallback(payloadStr);
 
+    //IR
     if (IRfunctionalityState)
     {
         if (strcmp(topic, topicRemote.c_str()) == 0)

@@ -24,7 +24,7 @@ void ArduinoRedOTA::loop() const
 void ArduinoRedOTA::OTASupport() const
 {
     ArduinoOTA.setHostname(deviceName);
-    ArduinoOTA.setPassword("1234");
+    ArduinoOTA.setPassword("2009");
 
     /*ArduinoOTA.onStart([]() {
             String type = (ArduinoOTA.getCommand() == U_FLASH) ? "sketch" : "filesystem";

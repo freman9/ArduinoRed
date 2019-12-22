@@ -3,8 +3,62 @@
 //external functions
 extern void Debug(String DebugLine, boolean addTime = true, boolean newLine = true, boolean sendToMqtt = true);
 
+//own variables
+const int numberOfPins = 30;
+String boardState[numberOfPins][2];
+
 //methods
-ArduinoRedBoard::ArduinoRedBoard() {}
+ArduinoRedBoard::ArduinoRedBoard()
+{
+    lastBoardStateRefresh = 0;
+    boardStateRefreshLag_sec = 5;
+
+    for (uint16_t i = 0; i < numberOfPins; i++) //initialize boardState array
+    {
+        boardState[i][0] = "null";
+        boardState[i][1] = "null";
+    }
+}
+
+void ArduinoRedBoard::setup()
+{
+    topicBoardPinValues = getClientConfigurationDocCallback("client", "name") + "/board/pinValues";
+}
+
+void ArduinoRedBoard::loop() const
+{
+
+    long now = millis();
+    if (now - lastBoardStateRefresh > boardStateRefreshLag_sec * 1000)
+    {
+        lastBoardStateRefresh = now;
+
+        for (uint16_t i = 0; i < numberOfPins; i++)
+        {
+            if ((boardState[i][0] == "INPUT") ||
+                (boardState[i][0] == "INPUT_PULLUP") ||
+                (boardState[i][0] == "INPUT_PULLDOWN") ||
+                (boardState[i][0] == "INPUT_PULLDOWN_16"))
+            {
+                int digitalPinValue = digitalRead(i);
+                float analogPinValue = analogRead(i); ////todo: analogRead()?
+
+                String jsonPinValueString;
+                StaticJsonDocument<300> pinValueDoc;
+                String jsonDHTString;
+                pinValueDoc["#"] = i;
+                pinValueDoc["mode"] = boardState[i][0];
+                pinValueDoc["state"] = boardState[i][1];
+                pinValueDoc["digital"] = digitalPinValue;
+                pinValueDoc["analog"] = analogPinValue;
+
+                serializeJson(pinValueDoc, jsonPinValueString);
+
+                mqttPublishCallback(topicBoardPinValues.c_str(), jsonPinValueString.c_str());
+            }
+        }
+    }
+}
 
 void ArduinoRedBoard::boardCallback(String payload) const
 {
@@ -26,7 +80,12 @@ void ArduinoRedBoard::boardCallback(String payload) const
     String mode = boardNodeRedInteractionDoc["mode"].as<String>();
 
     pinMode(pin, str2Enum(mode));
-    digitalWrite(pin, str2Enum(state));
+    if (str2Enum(mode) == OUTPUT)
+        digitalWrite(pin, str2Enum(state));
+
+    //save pin mode & state
+    boardState[pin][0] = mode;
+    boardState[pin][1] = state;
 }
 
 uint8_t ArduinoRedBoard::str2Enum(String str) const
