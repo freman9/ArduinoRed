@@ -32,8 +32,8 @@ private:
     String topicBoard;
 
     //if (IRfunctionalityState){
-    String topicRemote = "";             ////
-    String topicRemoteTransimtCode = ""; ////
+    String topicRemote = "null";             ////
+    String topicRemoteTransmitCode = "null"; ////
     //}
 
     //mqttDebug

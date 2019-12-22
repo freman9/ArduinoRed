@@ -43,7 +43,7 @@ void ArduinoRedMqttClient::setup()
     if (IRfunctionalityState)
     {
         topicRemote = clientConfigurationDoc["client"]["name"].as<String>() + "/remote";
-        topicRemoteTransimtCode = clientConfigurationDoc["client"]["name"].as<String>() + "/remote/transmitCode";
+        topicRemoteTransmitCode = clientConfigurationDoc["client"]["name"].as<String>() + "/remote/transmitCode";
     }
 
     pubSubClient.setCallback([this](char *topic, uint8_t *payload, unsigned int length) {
@@ -102,7 +102,7 @@ void ArduinoRedMqttClient::pubSubClientSubscribe() const
     if (IRfunctionalityState)
     {
         pubSubClient.subscribe(topicRemote.c_str(), 1);
-        pubSubClient.subscribe(topicRemoteTransimtCode.c_str(), 1);
+        pubSubClient.subscribe(topicRemoteTransmitCode.c_str(), 1);
     }
 
     for (uint16_t i = 0; i < clientConfigurationDoc["topics"].size(); i++)
@@ -125,9 +125,8 @@ void ArduinoRedMqttClient::pubSubClientCallback(char *topic, uint8_t *payload, u
         payloadStr += (char)payload[i];
 
     if (strcmp(topic, topicDebug.c_str()) != 0)
-        if (IRfunctionalityState)
-            if (strcmp(topic, topicRemoteTransimtCode.c_str()) != 0)
-                Debug("[mqtt] topic: " + String(topic) + ", payload: " + payloadStr);
+        if (strcmp(topic, topicRemoteTransmitCode.c_str()) != 0)
+            Debug("[mqtt] topic: " + String(topic) + ", payload: " + payloadStr);
 
     //status, debug & rest
     if (strcmp(topic, topicStatus.c_str()) == 0)
@@ -169,7 +168,7 @@ void ArduinoRedMqttClient::pubSubClientCallback(char *topic, uint8_t *payload, u
                 setRemoteModeCallback(false);
         }
 
-        if (strcmp(topic, topicRemoteTransimtCode.c_str()) == 0)
+        if (strcmp(topic, topicRemoteTransmitCode.c_str()) == 0)
         {
             transmitIRCodeCallback(payloadStr);
         }
