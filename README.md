@@ -43,12 +43,19 @@ extern const uint16_t irReciverPin = 14;
 
 
 void setup()
+
 {
+
   Serial.begin(115200);
+  
   arduinoRed.setup();
+  
 }
 
 void loop()
+
 {
+
   arduinoRed.loop();
+  
 }
