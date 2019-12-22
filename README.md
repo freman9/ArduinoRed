@@ -63,7 +63,7 @@ void loop()
 
 Node-Red
 --------
-The ESP devices needs to get the mqttbroker paramters from node-red,
+The ESP devices needs to get the mqttbroker parameters from node-red,
 
 (you have to set node-red before turning on the ESP)
 
@@ -101,7 +101,7 @@ and respond with json object:
       
     },
     
-   "topics":                  //optional - you can define multiple topics for th ESP to subscribe
+   "topics":                  //optional - you can define multiple topics for the ESP to subscribe
    
       [{"topic":"test","qos":1,"subscribe":true}],
       
