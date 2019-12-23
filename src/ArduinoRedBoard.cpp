@@ -47,9 +47,9 @@ void ArduinoRedBoard::loop() const
                 StaticJsonDocument<300> pinValueDoc;
                 String jsonDHTString;
 
-                pinValueDoc["#"] = pin;
-                ////pinValueDoc["mode"] = boardState[pin][0];
-                ////pinValueDoc["state"] = boardState[pin][1];
+                pinValueDoc["pin"] = pin;
+                pinValueDoc["mode"] = boardState[pin][0];
+                pinValueDoc["state"] = boardState[pin][1];
                 pinValueDoc["digital"] = digitalPinValue;
                 pinValueDoc["analog"] = analogPinValue;
 
@@ -83,13 +83,16 @@ void ArduinoRedBoard::boardCallback(String payload) const
     String state = boardNodeRedInteractionDoc["state"].as<String>();
     String mode = boardNodeRedInteractionDoc["mode"].as<String>();
 
-    pinMode(pin, str2Enum(mode));
-    if (str2Enum(mode) == OUTPUT)
-        digitalWrite(pin, str2Enum(state));
+    if (str2Enum(mode)) //check for MODE validity
+    {
+        pinMode(pin, str2Enum(mode));
+        if (str2Enum(mode) == OUTPUT)
+            digitalWrite(pin, str2Enum(state));
 
-    //save pin mode & state
-    boardState[pin][0] = mode;
-    boardState[pin][1] = state;
+        //save pin mode & state
+        boardState[pin][0] = mode;
+        boardState[pin][1] = state;
+    }
 }
 
 uint8_t ArduinoRedBoard::str2Enum(String str) const
