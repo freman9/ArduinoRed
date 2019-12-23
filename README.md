@@ -141,7 +141,7 @@ recive dht data as json object on topic ["device name"/thermostat/status]
 IR
 --
 
-recive IR reciver data on topic ["device name"/remote/recivedCode]
+recive IR data on topic ["device name"/remote/recivedCode]
 
 send IR command (prontocode style as string) to topic ["device name"/remote/transmitCode]
 
