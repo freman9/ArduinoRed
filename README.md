@@ -36,7 +36,7 @@ extern const uint8_t DHTPin = 17;
 
 extern const uint16_t irTransmiterPin = 4;
 
-extern const uint16_t irReciverPin = 14;
+extern const uint16_t irReceiverPin = 14;
 
 
 #include <ArduinoRed.h>
@@ -122,7 +122,7 @@ send the json object to "http response" node.
 Device status
 -------------
 
-recive device status on topic ["device name"/status]
+receive device status on topic ["device name"/status]
 
 send device status quary to topic ["device name"/status] payload ["sync"]
 
@@ -131,17 +131,17 @@ Device debug
 
 control debug messages broadcasting by sending ["startDebug"] or ["stopDebug"] to topic ["device name"/status]
 
-recive debug messages on ["device name"/debug]
+receive debug messages on ["device name"/debug]
 
 DHT
 ---
 
-recive dht data as json object on topic ["device name"/thermostat/status]
+receive dht data as json object on topic ["device name"/thermostat/status]
 
 IR
 --
 
-recive IR data on topic ["device name"/remote/recivedCode]
+receive IR data on topic ["device name"/remote/recivedCode]
 
 send IR command (prontocode style as string) to topic ["device name"/remote/transmitCode]
 
