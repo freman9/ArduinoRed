@@ -86,7 +86,7 @@ void ArduinoRedBoard::boardCallback(String payload) const
     String state = boardNodeRedInteractionDoc["state"].as<String>();
     String mode = boardNodeRedInteractionDoc["mode"].as<String>();
 
-    if (str2Enum(mode)) //check for MODE validity
+    if (str2Enum(mode) != 99) //check for MODE validity
     {
         pinMode(pin, str2Enum(mode));
 
@@ -121,5 +121,5 @@ uint8_t ArduinoRedBoard::str2Enum(String str) const
     if (str == "HIGH")
         return HIGH;
 
-    return 0;
+    return 99;
 }
