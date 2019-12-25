@@ -8,7 +8,7 @@ class ArduinoRedBoard
 {
 private:
     mutable long lastBoardStateRefresh;
-    mutable int boardStateRefreshLag_sec;
+    mutable int boardStateRefreshRate_sec;
 
     String topicBoardPinValues;
 

@@ -11,7 +11,7 @@ String boardState[numberOfPins][2];
 ArduinoRedBoard::ArduinoRedBoard()
 {
     lastBoardStateRefresh = 0;
-    boardStateRefreshLag_sec = 5;
+    boardStateRefreshRate_sec = 5;
 
     for (uint16_t pin = 0; pin < numberOfPins; pin++) //initialize boardState array
     {
@@ -29,7 +29,7 @@ void ArduinoRedBoard::loop() const
 {
 
     long now = millis();
-    if (now - lastBoardStateRefresh > boardStateRefreshLag_sec * 1000)
+    if (now - lastBoardStateRefresh > boardStateRefreshRate_sec * 1000)
     {
         lastBoardStateRefresh = now;
 
@@ -55,10 +55,7 @@ void ArduinoRedBoard::loop() const
 
                 serializeJson(pinValueDoc, jsonPinValueString);
 
-                if (jsonPinValueString.length() > 80)
-                    Debug("jsonPinValueString is to big for mqtt msg > 80");
-                else
-                    mqttPublishCallback(topicBoardPinValues.c_str(), jsonPinValueString.c_str());
+                mqttPublishCallback(topicBoardPinValues.c_str(), jsonPinValueString.c_str());
             }
         }
     }
@@ -79,6 +76,12 @@ void ArduinoRedBoard::boardCallback(String payload) const
     serializeJsonPretty(boardNodeRedInteractionDoc, Serial);
     Debug("", false, true, false);
 
+    if (boardNodeRedInteractionDoc["boardStateRefreshRate"].as<int>())
+    {
+        boardStateRefreshRate_sec = boardNodeRedInteractionDoc["boardStateRefreshRate"].as<int>();
+        Debug("board state refrsh rate changed to: " + String(boardStateRefreshRate_sec));
+    }
+
     int pin = boardNodeRedInteractionDoc["pin"].as<int>();
     String state = boardNodeRedInteractionDoc["state"].as<String>();
     String mode = boardNodeRedInteractionDoc["mode"].as<String>();
@@ -86,6 +89,7 @@ void ArduinoRedBoard::boardCallback(String payload) const
     if (str2Enum(mode)) //check for MODE validity
     {
         pinMode(pin, str2Enum(mode));
+
         if (str2Enum(mode) == OUTPUT)
             digitalWrite(pin, str2Enum(state));
 

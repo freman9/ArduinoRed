@@ -65,16 +65,16 @@ protected:
 
     void setup();
 
-    void loop() const;
+    void loop();
 
 private:
     void pubSubClientSubscribe() const;
 
-    void pubSubClientCallback(char *topic, uint8_t *payload, unsigned int length) const;
+    void pubSubClientCallback(char *topic, uint8_t *payload, unsigned int length);
 
-    void mqttServerConnect() const;
+    void mqttServerConnect();
 
-    void flushDebugToPubSubClient() const;
+    void flushDebugToPubSubClient();
 };
 
 #endif
