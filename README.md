@@ -159,3 +159,8 @@ i.e. msg.payload={"pin":12,"state":"LOW","mode":"OUTPUT"}
 //mode: "INPUT"/"OUTPUT"/"INPUT_PULLUP"/"INPUT_PULLUP_16"
 
 subscribe to topic ["device name"/board/pinValues] to get pins values (which you previously set to input)
+
+General notes
+-------------
+message sent to the device should not be greater than 122 characters (topic + payload length) [pubsubclient library limitation]
+the same for message sent from the device
