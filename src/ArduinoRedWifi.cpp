@@ -34,7 +34,7 @@ void ArduinoRedWifi::getArduinoRedConfiguration() const
 {
     HTTPClient https;
 
-    String URI = String(nodeRedURL) + "/getArduinoRedConfiguration" + "?key=" +
+    String URI = String(nodeRedURL) + "/" + String(deviceName) + "?key=" +
                  String(arduinoRedCode) +
                  "&deviceName=" + String(deviceName);
 
