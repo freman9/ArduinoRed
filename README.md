@@ -11,7 +11,7 @@ main.cpp
 
 const char *deviceName="ESP32D1";
 
-const char *arduinoRedCode="passkey";
+const char *arduinoRedCode="passkey";//optional for verification in node-red
 
 const char *nodeRedURL="...noderedurl..."; //(without http/s)
 
