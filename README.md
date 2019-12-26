@@ -69,7 +69,7 @@ The ESP devices needs to get the mqttbroker parameters from node-red,
 
 instructions:
 
-create "http in" node with url "/devicename" (i.e. /BedRoomESP) and respond with json object:
+create "http in" node with url "/devicename" (i.e. /ESP32D1) and respond with json object:
 
 "{
 
