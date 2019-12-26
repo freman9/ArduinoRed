@@ -11,7 +11,7 @@ main.cpp
 
 const char *deviceName="ESP32D1";
 
-const char *arduinoRedCode="passkey";//optional for verification in node-red
+const char *arduinoRedCode="passkey";//for verification in node-red
 
 const char *nodeRedURL="...noderedurl..."; //(without http/s)
 
@@ -63,7 +63,7 @@ void loop()
 
 Node-Red
 --------
-The ESP devices needs to get the mqttbroker parameters from node-red,
+The ESP devices needs to get the mqtt broker and additional parameters from node-red
 
 (you have to set node-red before turning on the ESP)
 
@@ -113,7 +113,7 @@ create "http in" node with url "/devicename" (i.e. /ESP32D1) and respond with js
    
  }"
  
-the device name should match the one typed in the main.cpp.
+the client name should match the one typed in the main.cpp.
 
 send the json object to "http response" node.
 
@@ -127,7 +127,7 @@ send device status quary to topic ["device name"/status] payload ["sync"]
 Device debug
 -------------
 
-control debug messages broadcasting by sending ["startDebug"] or ["stopDebug"] to topic ["device name"/status]
+control debug messages broadcasting by sending {"debug":"start"} or {"debug":"stop"} to topic ["device name"/status]
 
 receive debug messages on ["device name"/debug]
 
@@ -141,9 +141,9 @@ IR
 
 receive IR data on topic ["device name"/remote/recivedCode]
 
-send IR command (prontocode style as string) to topic ["device name"/remote/transmitCode]
+send IR command (prontocode style as string) to topic ["device name"/remote/transmitCode] //split the string by using split node at 70 characters
 
-change mode (learn/normal) by sending ["mode:learn"] or ["mode:normal"] to topic ["device name"/remote]
+change mode (learn/normal) by sending {"mode":"learn"} or {"mode":"normal"} to topic ["device name"/remote]
 
 Control the board
 -----------------
@@ -156,9 +156,9 @@ i.e. msg.payload={"pin":12,"state":"LOW","mode":"OUTPUT"}
 
 //mode: "INPUT"/"OUTPUT"/"INPUT_PULLUP"/"INPUT_PULLUP_16"
 
-subscribe to topic ["device name"/board/pinValues] to get pins values (which you previously set to input)
+subscribe to topic ["device name"/board/pinValues] to get pins values (which you previously set as input)
 
 General notes
 -------------
 message sent to the device should not be greater than 122 characters (topic + payload length) [pubsubclient library limitation]
-the same for message sent from the device
+the same for message sent from the device, this is the reasone for spliting pronto code messages
