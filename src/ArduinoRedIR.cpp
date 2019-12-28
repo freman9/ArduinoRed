@@ -2,7 +2,6 @@
 
 //external functions
 extern void Debug(String DebugLine, boolean addTime = true, boolean newLine = true, boolean sendToMqtt = true);
-extern String SimpleJsonGenerator(String element, String value);
 
 //external variables
 extern uint16_t irTransmiterPin;
@@ -15,7 +14,7 @@ IRrecv irRecviver(irReceiverPin);
 //methods
 ArduinoRedIR::ArduinoRedIR() {}
 
-void ArduinoRedIR::setup() const
+void ArduinoRedIR::setup()
 {
     Debug("starting IR reciver");
     irRecviver.enableIRIn();
@@ -26,7 +25,7 @@ void ArduinoRedIR::setup() const
     topicRemote = getClientConfigurationDocCallback("client", "name") + "/remote";
 
     remoteLearningMode = false;
-    mqttPublishCallback(topicRemote.c_str(), SimpleJsonGenerator("mode", "normal").c_str());
+    mqttPublishCallback(topicRemote.c_str(), ArduinoRedUtils::SimpleJsonGenerator("mode", "normal").c_str());
 }
 
 void ArduinoRedIR::loop()
@@ -44,7 +43,7 @@ void ArduinoRedIR::loop()
             runIrDump = false;
 
             mqttPublishCallback(topicRemoteRecivedCode.c_str(), irDumpStr.c_str());
-            ////mqttPublishCallback(topicRemote.c_str(), SimpleJsonGenerator("mode", "normal").c_str());
+            ////mqttPublishCallback(topicRemote.c_str(), ArduinoRedUtils::SimpleJsonGenerator("mode", "normal").c_str());
             ////remoteLearningMode = false;
         }
     }

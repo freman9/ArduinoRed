@@ -4,6 +4,7 @@
 #include <PubSubClient.h>
 #include <ArduinoJson.h>
 #include <functional>
+#include <ArduinoRedUtils.h>
 
 #ifdef ESP32
 #include <WiFi.h>
@@ -14,7 +15,7 @@
 #include <ESP8266HTTPClient.h>
 #endif
 
-class ArduinoRedMqttClient
+class ArduinoRedMqttClient : private ArduinoRedUtils
 {
 private:
     String clientName;

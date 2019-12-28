@@ -6,8 +6,9 @@
 #include <IRutils.h>
 #include <IRsend.h>
 #include <functional>
+#include <ArduinoRedUtils.h>
 
-class ArduinoRedIR
+class ArduinoRedIR : private ArduinoRedUtils
 {
 private:
     mutable String topicRemote;
@@ -32,7 +33,7 @@ protected:
 
     std::function<void(const char *, const char *)> mqttPublishCallback;
 
-    void setup() const;
+    void setup();
 
     void loop();
 

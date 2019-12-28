@@ -2,7 +2,6 @@
 
 //external functions
 extern void Debug(String DebugLine, boolean addTime = true, boolean newLine = true, boolean sendToMqtt = true);
-extern String SimpleJsonGenerator(String element, String value);
 
 //external variables
 
@@ -151,10 +150,10 @@ void ArduinoRedMqttClient::pubSubClientCallback(char *topic, uint8_t *payload, u
         if (strcmp(payloadStr.c_str(), "getEspMemStatus") == 0)
             getEspMemStatusCallback();
 
-        if (strcmp(payloadStr.c_str(), SimpleJsonGenerator("debug", "start").c_str()) == 0)
+        if (strcmp(payloadStr.c_str(), ArduinoRedUtils::SimpleJsonGenerator("debug", "start").c_str()) == 0)
             pubSubClientDebugState = true;
 
-        if (strcmp(payloadStr.c_str(), SimpleJsonGenerator("debug", "stop").c_str()) == 0)
+        if (strcmp(payloadStr.c_str(), ArduinoRedUtils::SimpleJsonGenerator("debug", "stop").c_str()) == 0)
             pubSubClientDebugState = false;
 
         if (strcmp(payloadStr.c_str(), "reset") == 0)
@@ -173,10 +172,10 @@ void ArduinoRedMqttClient::pubSubClientCallback(char *topic, uint8_t *payload, u
     {
         if (strcmp(topic, topicRemote.c_str()) == 0)
         {
-            if (strcmp(payloadStr.c_str(), SimpleJsonGenerator("mode", "learn").c_str()) == 0)
+            if (strcmp(payloadStr.c_str(), ArduinoRedUtils::SimpleJsonGenerator("mode", "learn").c_str()) == 0)
                 setRemoteModeCallback(true);
 
-            if (strcmp(payloadStr.c_str(), SimpleJsonGenerator("mode", "normal").c_str()) == 0)
+            if (strcmp(payloadStr.c_str(), ArduinoRedUtils::SimpleJsonGenerator("mode", "normal").c_str()) == 0)
                 setRemoteModeCallback(false);
         }
 

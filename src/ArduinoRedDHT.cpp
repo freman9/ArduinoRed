@@ -42,7 +42,7 @@ void ArduinoRedDHT::loop()
 
 void ArduinoRedDHT::setDHTConfig()
 {
-    DHTRefreshLag_sec = atoi(getClientConfigurationDocCallback("dht", "refreshLag").c_str());
+    DHTRefreshLag_sec = atoi(getClientConfigurationDocCallback("dht", "refreshLag_sec").c_str());
     diffTemperature = atof(getClientConfigurationDocCallback("dht", "diffTemperature").c_str());
     diffHumidity = atof(getClientConfigurationDocCallback("dht", "diffHumidity").c_str());
 }

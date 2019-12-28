@@ -1,8 +1,6 @@
 #ifndef ArduinoRed_h
 #define ArduinoRed_h
 
-#include <ArduinoJson.h>
-
 void Debug(String DebugLine, boolean addTime = true, boolean newLine = true, boolean sendToMqtt = true);
 
 #include <ArduinoRedWifi.h>
@@ -131,7 +129,7 @@ private:
 
 ArduinoRed arduinoRed;
 
-//ArduinoRed::Utils
+//ArduinoRed::Debug
 void Debug(String DebugLine, boolean addTime, boolean newLine, boolean sendToMqtt)
 {
         String DebugString = "";
@@ -148,18 +146,6 @@ void Debug(String DebugLine, boolean addTime, boolean newLine, boolean sendToMqt
 
         if (sendToMqtt)
                 arduinoRed.ArduinoRedMqttClient::addtoDebugBuff(DebugString);
-}
-
-String SimpleJsonGenerator(String element, String value) //todo: convert to template?
-{
-        String JsonObj = "{\"" + element + "\":\"" + value + "\"}";
-        return JsonObj;
-}
-
-String SimpleJsonGenerator(String element, int value)
-{
-        String JsonObj = "{\"" + element + "\":" + String(value) + "}";
-        return JsonObj;
 }
 
 #endif
