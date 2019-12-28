@@ -91,7 +91,7 @@ create "http in" node with url "/devicename" (i.e. /ESP32D1) and respond with js
   
     {
     
-      "refreshLag":5,         //dht refresh time in seconds
+      "refreshLag_sec":5,         //dht refresh time in seconds
       
       "diffTemperature":0.2,  //min delta temperature to update thermostat data
       
