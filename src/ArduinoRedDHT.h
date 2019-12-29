@@ -9,14 +9,14 @@ class ArduinoRedDHT
 {
 private:
 #define DHTTYPE DHT22
-    DHTesp dht;
+    mutable DHTesp dht;
 
-    long lastDhtRefresh;
-    float oldTemperature, oldHumidity;
-    float diffTemperature, diffHumidity;
-    int DHTRefreshLag_sec;
+    mutable long lastDhtRefresh;
+    mutable float oldTemperature, oldHumidity;
+    mutable float diffTemperature, diffHumidity;
+    mutable int DHTRefreshLag_sec;
 
-    String topicThermostat;
+    mutable String topicThermostat;
 
 public:
 protected:
@@ -26,14 +26,14 @@ protected:
 
     std::function<void(const char *, const char *)> mqttPublishCallback;
 
-    void setup();
+    void setup() const;
 
-    void loop();
+    void loop() const;
 
 private:
-    void setDHTConfig();
+    void setDHTConfig() const;
 
-    void RefreshDHT();
+    void RefreshDHT() const;
 };
 
 #endif

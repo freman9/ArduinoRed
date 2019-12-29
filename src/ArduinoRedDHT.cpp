@@ -19,7 +19,7 @@ ArduinoRedDHT::ArduinoRedDHT()
     DHTRefreshLag_sec = 5;
 }
 
-void ArduinoRedDHT::setup()
+void ArduinoRedDHT::setup() const
 {
     topicThermostat = getClientConfigurationDocCallback("client", "name") + "/thermostat/status";
 
@@ -30,7 +30,7 @@ void ArduinoRedDHT::setup()
           " diffHumidity: " + String(diffHumidity));
 }
 
-void ArduinoRedDHT::loop()
+void ArduinoRedDHT::loop() const
 {
     long now = millis();
     if (now - lastDhtRefresh > DHTRefreshLag_sec * 1000)
@@ -40,14 +40,14 @@ void ArduinoRedDHT::loop()
     }
 }
 
-void ArduinoRedDHT::setDHTConfig()
+void ArduinoRedDHT::setDHTConfig() const
 {
     DHTRefreshLag_sec = atoi(getClientConfigurationDocCallback("dht", "refreshLag_sec").c_str());
     diffTemperature = atof(getClientConfigurationDocCallback("dht", "diffTemperature").c_str());
     diffHumidity = atof(getClientConfigurationDocCallback("dht", "diffHumidity").c_str());
 }
 
-void ArduinoRedDHT::RefreshDHT()
+void ArduinoRedDHT::RefreshDHT() const
 {
     StaticJsonDocument<100> thermostatDoc;
     String jsonDHTString;

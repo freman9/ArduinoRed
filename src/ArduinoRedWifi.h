@@ -1,6 +1,8 @@
 #ifndef ArduinoRedWifi_h
 #define ArduinoRedWifi_h
 
+#include <functional>
+
 #ifdef ESP32
 #include <WiFi.h>
 #include <ESPmDNS.h>
@@ -11,8 +13,6 @@
 #include <ESP8266mDNS.h>
 #include <ESP8266HTTPClient.h>
 #endif
-
-#include <functional>
 
 class ArduinoRedWifi
 {

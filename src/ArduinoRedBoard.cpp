@@ -4,8 +4,6 @@
 extern void Debug(String DebugLine, boolean addTime = true, boolean newLine = true, boolean sendToMqtt = true);
 
 //own variables
-const int numberOfPins = 30;
-String boardState[numberOfPins][2];
 
 //methods
 ArduinoRedBoard::ArduinoRedBoard()
@@ -20,7 +18,7 @@ ArduinoRedBoard::ArduinoRedBoard()
     }
 }
 
-void ArduinoRedBoard::setup()
+void ArduinoRedBoard::setup() const
 {
     topicBoardPinValues = getClientConfigurationDocCallback("client", "name") + "/board/pinValues";
 }

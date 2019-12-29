@@ -21,7 +21,7 @@ StaticJsonDocument<clientConfigurationDocSize> clientConfigurationDoc;
 //methods
 ArduinoRedMqttClient::ArduinoRedMqttClient() {}
 
-void ArduinoRedMqttClient::setup()
+void ArduinoRedMqttClient::setup() const
 {
 
 #ifdef ESP8266
@@ -53,7 +53,7 @@ void ArduinoRedMqttClient::setup()
     mqttServerConnect();
 }
 
-void ArduinoRedMqttClient::loop()
+void ArduinoRedMqttClient::loop() const
 {
     if (!pubSubClient.connected())
         mqttServerConnect();
@@ -76,12 +76,12 @@ void ArduinoRedMqttClient::updateClientConfigurationDoc(String clientConfigurati
     Serial.println();
 }
 
-String ArduinoRedMqttClient::getClientConfigurationDoc(String firstElement, String secondElement)
+String ArduinoRedMqttClient::getClientConfigurationDoc(String firstElement, String secondElement) const
 {
     return clientConfigurationDoc[firstElement][secondElement].as<String>();
 }
 
-void ArduinoRedMqttClient::mqttPublish(const char *topic, const char *payload)
+void ArduinoRedMqttClient::mqttPublish(const char *topic, const char *payload) const
 {
     size_t totalMqttMessageLength = strlen(topic) + strlen(payload);
 
@@ -123,7 +123,7 @@ void ArduinoRedMqttClient::pubSubClientSubscribe() const
     }
 }
 
-void ArduinoRedMqttClient::pubSubClientCallback(char *topic, uint8_t *payload, unsigned int length)
+void ArduinoRedMqttClient::pubSubClientCallback(char *topic, uint8_t *payload, unsigned int length) const
 {
     String payloadStr;
     for (unsigned int i = 0; i < length; i++)
@@ -196,7 +196,7 @@ void ArduinoRedMqttClient::pubSubClientCallback(char *topic, uint8_t *payload, u
     }
 }
 
-void ArduinoRedMqttClient::mqttServerConnect()
+void ArduinoRedMqttClient::mqttServerConnect() const
 {
     while (!pubSubClient.connected())
     {
@@ -261,7 +261,7 @@ void ArduinoRedMqttClient::mqttServerConnect()
     }
 }
 
-void ArduinoRedMqttClient::flushDebugToPubSubClient()
+void ArduinoRedMqttClient::flushDebugToPubSubClient() const
 {
     if ((pubSubClientDebugBuffer != "") && (pubSubClientDebugState))
     {

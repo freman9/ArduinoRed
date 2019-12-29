@@ -4,13 +4,17 @@
 #include <ArduinoJson.h>
 #include <functional>
 
+#define numberOfPins 40
+
 class ArduinoRedBoard
 {
 private:
+    mutable String boardState[numberOfPins][2];
+
     mutable long lastBoardStateRefresh;
     mutable int boardStateRefreshRate_sec;
 
-    String topicBoardPinValues;
+    mutable String topicBoardPinValues;
 
 public:
     void boardCallback(String payload) const;
@@ -22,7 +26,7 @@ protected:
 
     std::function<void(const char *, const char *)> mqttPublishCallback;
 
-    void setup();
+    void setup() const;
 
     void loop() const;
 

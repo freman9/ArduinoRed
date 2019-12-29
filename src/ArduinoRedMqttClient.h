@@ -18,29 +18,29 @@
 class ArduinoRedMqttClient : private ArduinoRedUtils
 {
 private:
-    String clientName;
-    String mqttServer;
-    uint16_t mqttPort;
-    String mqttUser;
-    String mqttPassword;
-
     const boolean retained = true;
     const boolean willRetain = false;
     const byte willQoS = 1;
 
-    String topicStatus;
-    String topicDebug;
-    String topicBoard;
+    mutable String clientName;
+    mutable String mqttServer;
+    mutable uint16_t mqttPort;
+    mutable String mqttUser;
+    mutable String mqttPassword;
+
+    mutable String topicStatus;
+    mutable String topicDebug;
+    mutable String topicBoard;
 
     //if (IRfunctionalityState){
-    String topicRemote = "null";             ////
-    String topicRemoteTransmitCode = "null"; ////
-    //}
+    mutable String topicRemote = "null";             ////
+    mutable String topicRemoteTransmitCode = "null"; ////
+                                                     //}
 
     //mqttDebug
+    const int pubSubClientDebugBufferLimit = 1005; ////
     mutable boolean pubSubClientDebugState = false;
     mutable String pubSubClientDebugBuffer;
-    const int pubSubClientDebugBufferLimit = 1005; ////
 
 public:
     boolean IRfunctionalityState = false;
@@ -49,9 +49,9 @@ public:
 
     void updateClientConfigurationDoc(String clientConfiguration) const;
 
-    void mqttPublish(const char *topic, const char *payload);
+    void mqttPublish(const char *topic, const char *payload) const;
 
-    String getClientConfigurationDoc(String first, String second);
+    String getClientConfigurationDoc(String first, String second) const;
 
 protected:
     ArduinoRedMqttClient();
@@ -64,18 +64,18 @@ protected:
 
     std::function<void(String)> transmitIRCodeCallback;
 
-    void setup();
+    void setup() const;
 
-    void loop();
+    void loop() const;
 
 private:
     void pubSubClientSubscribe() const;
 
-    void pubSubClientCallback(char *topic, uint8_t *payload, unsigned int length);
+    void pubSubClientCallback(char *topic, uint8_t *payload, unsigned int length) const;
 
-    void mqttServerConnect();
+    void mqttServerConnect() const;
 
-    void flushDebugToPubSubClient();
+    void flushDebugToPubSubClient() const;
 };
 
 #endif

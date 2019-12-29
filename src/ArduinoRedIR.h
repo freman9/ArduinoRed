@@ -14,17 +14,17 @@ private:
     mutable String topicRemote;
     mutable String topicRemoteRecivedCode;
 
-    decode_results irRecvResults;
-    uint64_t lastIrCodeRecived = 0;
-    int irCodeCounter = 0;
-    boolean runIrDump = false;
+    mutable decode_results irRecvResults;
+    mutable uint64_t lastIrCodeRecived = 0;
+    mutable int irCodeCounter = 0;
+    mutable boolean runIrDump = false;
 
-    String prontoCode = "";
+    mutable String prontoCode = "";
 
 public:
     mutable boolean remoteLearningMode;
 
-    void transmitIRCode(String prontoCodeMsg);
+    void transmitIRCode(String prontoCodeMsg) const;
 
 protected:
     ArduinoRedIR();
@@ -33,14 +33,14 @@ protected:
 
     std::function<void(const char *, const char *)> mqttPublishCallback;
 
-    void setup();
+    void setup() const;
 
-    void loop();
+    void loop() const;
 
 private:
     String uInt64toStrHex(uint64_t num) const;
 
-    void irCodeRecived(decode_results *irRecvResults);
+    void irCodeRecived(decode_results *irRecvResults) const;
 
     String irDump(decode_results *results) const;
 };

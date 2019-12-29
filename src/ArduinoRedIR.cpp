@@ -14,7 +14,7 @@ IRrecv irRecviver(irReceiverPin);
 //methods
 ArduinoRedIR::ArduinoRedIR() {}
 
-void ArduinoRedIR::setup()
+void ArduinoRedIR::setup() const
 {
     Debug("starting IR reciver");
     irRecviver.enableIRIn();
@@ -28,7 +28,7 @@ void ArduinoRedIR::setup()
     mqttPublishCallback(topicRemote.c_str(), ArduinoRedUtils::SimpleJsonGenerator("mode", "normal").c_str());
 }
 
-void ArduinoRedIR::loop()
+void ArduinoRedIR::loop() const
 {
     if (irRecviver.decode(&irRecvResults))
     {
@@ -49,7 +49,7 @@ void ArduinoRedIR::loop()
     }
 }
 
-void ArduinoRedIR::transmitIRCode(String prontoCodeMsg)
+void ArduinoRedIR::transmitIRCode(String prontoCodeMsg) const
 {
     prontoCode += prontoCodeMsg;
     if (prontoCode.length() > 1000)
@@ -85,7 +85,7 @@ String ArduinoRedIR::uInt64toStrHex(uint64_t num) const
     return String(buffer);
 }
 
-void ArduinoRedIR::irCodeRecived(decode_results *irRecvResults)
+void ArduinoRedIR::irCodeRecived(decode_results *irRecvResults) const
 {
     uint64_t receivedCode = irRecvResults->value;
 
