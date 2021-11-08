@@ -23,7 +23,11 @@ ArduinoRedMqttClient::ArduinoRedMqttClient() {}
 
 void ArduinoRedMqttClient::setup() const
 {
-
+    
+#ifdef ESP32
+    pubSubWiFiClient.setInsecure();
+#endif
+    
 #ifdef ESP8266
     pubSubWiFiClient.setInsecure();
 #endif
