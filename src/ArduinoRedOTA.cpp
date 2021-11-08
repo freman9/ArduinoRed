@@ -5,6 +5,7 @@ extern void Debug(String DebugLine, boolean addTime = true, boolean newLine = tr
 
 //external variables
 extern const char *deviceName;
+extern const char *arduinoRedCode;
 
 //own variables
 
@@ -24,7 +25,7 @@ void ArduinoRedOTA::loop() const
 void ArduinoRedOTA::OTASupport() const
 {
     ArduinoOTA.setHostname(deviceName);
-    ArduinoOTA.setPassword("2009");
+    ArduinoOTA.setPassword(arduinoRedCode);
 
     ArduinoOTA.begin();
 
