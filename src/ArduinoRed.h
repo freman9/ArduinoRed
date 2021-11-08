@@ -8,8 +8,14 @@ void Debug(String DebugLine, boolean addTime = true, boolean newLine = true, boo
 #include <ArduinoRedNtp.h>
 #include <ArduinoRedBoard.h>
 #include <ArduinoRedMqttClient.h>
+
+#ifdef DHTfunctionality
 #include <ArduinoRedDHT.h>
+#endif
+
+#ifdef IRfunctionality
 #include <ArduinoRedIR.h>
+#endif
 
 class ArduinoRed : public ArduinoRedNtp,
                    public ArduinoRedMqttClient,
