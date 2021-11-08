@@ -41,6 +41,7 @@ void ArduinoRedWifi::getArduinoRedConfiguration() const
 #ifdef ESP32
     URI = "https://" + URI;
     WiFiClientSecure client;
+    client.setInsecure();
     https.begin(client, URI);
 #endif
 #ifdef ESP8266
@@ -83,7 +84,7 @@ void ArduinoRedWifi::WifiConnect() const
         }
     }
     Debug("connected", false);
-    Debug("local IP address: " + WiFi.localIP().toString() + ", host name: ");
+    Debug("local IP address: " + WiFi.localIP().toString() + ", host name: " + deviceName);
 
     Debug("RSSI: " + String(WiFi.RSSI()) + "dBm");
 
