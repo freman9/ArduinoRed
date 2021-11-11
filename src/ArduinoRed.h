@@ -1,6 +1,14 @@
 #ifndef ArduinoRed_h
 #define ArduinoRed_h
 
+//external variables
+extern const bool serialDebug;
+extern const bool telnetDebug;
+extern const bool mqttDebug;
+
+//own variables
+
+//methods
 void Debug(String DebugLine, boolean addTime = true, boolean newLine = true, boolean sendToMqtt = true);
 
 #include <ArduinoRedWifi.h>
@@ -8,6 +16,7 @@ void Debug(String DebugLine, boolean addTime = true, boolean newLine = true, boo
 #include <ArduinoRedNtp.h>
 #include <ArduinoRedBoard.h>
 #include <ArduinoRedMqttClient.h>
+#include <ArduinoRedTelnet.h>
 
 #ifdef DHTfunctionality
 #include <ArduinoRedDHT.h>
@@ -18,6 +27,7 @@ void Debug(String DebugLine, boolean addTime = true, boolean newLine = true, boo
 #endif
 
 class ArduinoRed : public ArduinoRedNtp,
+                   public ArduinoRedTelnet,
                    public ArduinoRedMqttClient,
                    private ArduinoRedWifi,
                    private ArduinoRedBoard,
@@ -43,8 +53,11 @@ public:
         {
                 Debug("*** statrtup script started ***");
 
-                ArduinoRedWifi::updateClientConfigurationDocCallback = [this](String clientConfiguration) { ArduinoRedMqttClient::updateClientConfigurationDoc(clientConfiguration); };
+                ArduinoRedWifi::updateClientConfigurationDocCallback = [this](String clientConfiguration)
+                { ArduinoRedMqttClient::updateClientConfigurationDoc(clientConfiguration); };
                 ArduinoRedWifi::setup();
+
+                ArduinoRedTelnet::setup();
 
                 ArduinoRedNtp::setup();
 
@@ -54,26 +67,36 @@ public:
 
                 ArduinoRedWifi::getArduinoRedConfiguration();
 
-                ArduinoRedMqttClient::boardCommandCallback = [this](String payloadStr) { ArduinoRedBoard::boardCallback(payloadStr); };
-                ArduinoRedMqttClient::getEspMemStatusCallback = [this]() { ArduinoRed::getEspMemStatus(); };
+                ArduinoRedMqttClient::boardCommandCallback = [this](String payloadStr)
+                { ArduinoRedBoard::boardCallback(payloadStr); };
+                ArduinoRedMqttClient::getEspMemStatusCallback = [this]()
+                { ArduinoRed::getEspMemStatus(); };
                 ArduinoRedMqttClient::setup();
 
-                ArduinoRedBoard::mqttPublishCallback = [this](const char *topic, const char *payload) { ArduinoRedMqttClient::mqttPublish(topic, payload); };
-                ArduinoRedBoard::getClientConfigurationDocCallback = [this](String first, String second) { return ArduinoRedMqttClient::getClientConfigurationDoc(first, second); };
+                ArduinoRedBoard::mqttPublishCallback = [this](const char *topic, const char *payload)
+                { ArduinoRedMqttClient::mqttPublish(topic, payload); };
+                ArduinoRedBoard::getClientConfigurationDocCallback = [this](String first, String second)
+                { return ArduinoRedMqttClient::getClientConfigurationDoc(first, second); };
                 ArduinoRedBoard::setup();
 
 #ifdef DHTfunctionality
-                ArduinoRedDHT::mqttPublishCallback = [this](const char *topic, const char *payload) { ArduinoRedMqttClient::mqttPublish(topic, payload); };
-                ArduinoRedDHT::getClientConfigurationDocCallback = [this](String first, String second) { return ArduinoRedMqttClient::getClientConfigurationDoc(first, second); };
+                ArduinoRedDHT::mqttPublishCallback = [this](const char *topic, const char *payload)
+                { ArduinoRedMqttClient::mqttPublish(topic, payload); };
+                ArduinoRedDHT::getClientConfigurationDocCallback = [this](String first, String second)
+                { return ArduinoRedMqttClient::getClientConfigurationDoc(first, second); };
                 ArduinoRedDHT::setup();
 #endif
 
 #ifdef IRfunctionality
-                ArduinoRedMqttClient::setRemoteModeCallback = [this](boolean state) { ArduinoRedIR::remoteLearningMode = state; };
-                ArduinoRedMqttClient::transmitIRCodeCallback = [this](String code) { ArduinoRedIR::transmitIRCode(code); };
+                ArduinoRedMqttClient::setRemoteModeCallback = [this](boolean state)
+                { ArduinoRedIR::remoteLearningMode = state; };
+                ArduinoRedMqttClient::transmitIRCodeCallback = [this](String code)
+                { ArduinoRedIR::transmitIRCode(code); };
 
-                ArduinoRedIR::mqttPublishCallback = [this](const char *topic, const char *payload) { ArduinoRedMqttClient::mqttPublish(topic, payload); };
-                ArduinoRedIR::getClientConfigurationDocCallback = [this](String first, String second) { return ArduinoRedMqttClient::getClientConfigurationDoc(first, second); };
+                ArduinoRedIR::mqttPublishCallback = [this](const char *topic, const char *payload)
+                { ArduinoRedMqttClient::mqttPublish(topic, payload); };
+                ArduinoRedIR::getClientConfigurationDocCallback = [this](String first, String second)
+                { return ArduinoRedMqttClient::getClientConfigurationDoc(first, second); };
                 ArduinoRedIR::setup();
 #endif
 
@@ -102,6 +125,8 @@ public:
 #ifdef IRfunctionality
                 ArduinoRedIR::loop();
 #endif
+
+                ArduinoRedTelnet::loop();
         }
 
 private:
@@ -148,9 +173,16 @@ void Debug(String DebugLine, boolean addTime, boolean newLine, boolean sendToMqt
         if (newLine)
                 DebugString += '\n';
 
-        Serial.print(DebugString);
+        //send to Serial
+        if (serialDebug)
+                Serial.print(DebugString);
 
-        if (sendToMqtt)
+        //send to telnet
+        if (telnetDebug)
+                TelnetStream.print(DebugString);
+
+        //send to MQTT
+        if ((mqttDebug) && (sendToMqtt))
                 arduinoRed.ArduinoRedMqttClient::addtoDebugBuff(DebugString);
 }
 

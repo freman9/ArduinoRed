@@ -7,8 +7,7 @@
 #include <ArduinoRedUtils.h>
 
 #ifdef ESP32
-#include <WiFi.h>
-#include <HTTPClient.h>
+#include <WiFiClientSecure.h>
 #endif
 #ifdef ESP8266
 #include <ESP8266WiFi.h>

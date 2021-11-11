@@ -23,13 +23,12 @@ ArduinoRedMqttClient::ArduinoRedMqttClient() {}
 
 void ArduinoRedMqttClient::setup() const
 {
-    
 #ifdef ESP32
-    pubSubWiFiClient.setInsecure();
+    pubSubWiFiClient.setInsecure(); ////
 #endif
-    
+
 #ifdef ESP8266
-    pubSubWiFiClient.setInsecure();
+    pubSubWiFiClient.setInsecure(); ////
 #endif
 
     clientName = clientConfigurationDoc["client"]["name"].as<String>();
@@ -50,9 +49,8 @@ void ArduinoRedMqttClient::setup() const
         topicRemoteTransmitCode = clientConfigurationDoc["client"]["name"].as<String>() + "/remote/transmitCode";
     }
 
-    pubSubClient.setCallback([this](char *topic, uint8_t *payload, unsigned int length) {
-        pubSubClientCallback(topic, payload, length);
-    });
+    pubSubClient.setCallback([this](char *topic, uint8_t *payload, unsigned int length)
+                             { pubSubClientCallback(topic, payload, length); });
 
     mqttServerConnect();
 }

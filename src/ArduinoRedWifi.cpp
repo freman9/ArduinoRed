@@ -14,6 +14,7 @@ extern const char *nodeRedURL;
 //own variables
 
 //methods
+
 ArduinoRedWifi::ArduinoRedWifi() {}
 
 void ArduinoRedWifi::setup() const
@@ -40,9 +41,7 @@ void ArduinoRedWifi::getArduinoRedConfiguration() const
 
 #ifdef ESP32
     URI = "https://" + URI;
-    WiFiClientSecure client;
-    client.setInsecure();
-    https.begin(client, URI);
+    https.begin(URI);
 #endif
 #ifdef ESP8266
     URI = "http://" + URI;
@@ -67,7 +66,7 @@ void ArduinoRedWifi::getArduinoRedConfiguration() const
 
 void ArduinoRedWifi::WifiConnect() const
 {
-    WiFi.mode(WIFI_STA);
+    ////WiFi.mode(WIFI_STA);
     WiFi.begin(wifiSSID, wifiPassword);
     Debug("connecting to: " + String(wifiSSID), true, false);
 

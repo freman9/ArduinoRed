@@ -26,7 +26,8 @@ void ArduinoRedOTA::OTASupport() const
 {
     ArduinoOTA.setHostname(deviceName);
     ArduinoOTA.setPassword(arduinoRedCode);
-
+    //upload_flags =
+    //    --auth=pass
     ArduinoOTA.begin();
 
     Debug("OTA Ready");

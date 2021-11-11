@@ -25,7 +25,7 @@ void ArduinoRedDHT::setup() const
 
     setDHTConfig();
     dht.setup(DHTPin, DHTesp::DHTTYPE);
-    Debug("DHT: DHTRefreshLag_sec: " + String(DHTRefreshLag_sec) +
+    Debug("DHT config: DHTRefreshLag_sec: " + String(DHTRefreshLag_sec) +
           " diffTemperature: " + String(diffTemperature) +
           " diffHumidity: " + String(diffHumidity));
 }
@@ -85,4 +85,5 @@ void ArduinoRedDHT::RefreshDHT() const
     serializeJson(thermostatDoc, jsonDHTString);
 
     mqttPublishCallback(topicThermostat.c_str(), jsonDHTString.c_str());
+    Debug(jsonDHTString.c_str()); ////
 }
