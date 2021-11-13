@@ -3,6 +3,9 @@
 //external functions
 extern void Debug(String DebugLine, boolean addTime = true, boolean newLine = true, boolean sendToMqtt = true);
 
+//external variables
+extern StaticJsonDocument<1024> configurationDoc;
+
 //own variables
 
 //methods
@@ -20,7 +23,7 @@ ArduinoRedBoard::ArduinoRedBoard()
 
 void ArduinoRedBoard::setup() const
 {
-    topicBoardPinValues = getClientConfigurationDocCallback("client", "name") + "/board/pinValues";
+    topicBoardPinValues = configurationDoc["device"]["deviceName"].as<String>() + "/board/pinValues";
 }
 
 void ArduinoRedBoard::loop() const
@@ -43,7 +46,6 @@ void ArduinoRedBoard::loop() const
 
                 String jsonPinValueString;
                 StaticJsonDocument<300> pinValueDoc;
-                String jsonDHTString;
 
                 pinValueDoc["pin"] = pin;
                 pinValueDoc["mode"] = boardState[pin][0];

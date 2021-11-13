@@ -1,12 +1,13 @@
 #ifndef ArduinoRedIR_h
 #define ArduinoRedIR_h
 
+#include <ArduinoJson.h>
+#include <functional>
+#include <ArduinoRedUtils.h>
 #include <IRremoteESP8266.h>
 #include <IRrecv.h>
 #include <IRutils.h>
 #include <IRsend.h>
-#include <functional>
-#include <ArduinoRedUtils.h>
 
 class ArduinoRedIR : private ArduinoRedUtils
 {

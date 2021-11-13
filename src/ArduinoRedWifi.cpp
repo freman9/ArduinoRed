@@ -4,12 +4,7 @@
 extern void Debug(String DebugLine, boolean addTime = true, boolean newLine = true, boolean sendToMqtt = true);
 
 //external variables
-extern const char *wifiSSID;
-extern const char *wifiPassword;
-
-extern const char *arduinoRedCode;
-extern const char *deviceName;
-extern const char *nodeRedURL;
+extern StaticJsonDocument<1024> configurationDoc;
 
 //own variables
 
@@ -31,44 +26,11 @@ void ArduinoRedWifi::loop() const
     }
 }
 
-void ArduinoRedWifi::getArduinoRedConfiguration() const
-{
-    HTTPClient https;
-
-    String URI = String(nodeRedURL) + "/" + String(deviceName) + "?key=" +
-                 String(arduinoRedCode) +
-                 "&deviceName=" + String(deviceName);
-
-#ifdef ESP32
-    URI = "https://" + URI;
-    https.begin(URI);
-#endif
-#ifdef ESP8266
-    URI = "http://" + URI;
-    https.begin(URI);
-#endif
-
-    String clientConfiguration = "";
-
-    if (https.GET() > 0)
-    {
-        clientConfiguration = https.getString();
-
-        updateClientConfigurationDocCallback(clientConfiguration);
-    }
-    else
-    {
-        Debug("Error on HTTP request");
-    }
-
-    https.end();
-}
-
 void ArduinoRedWifi::WifiConnect() const
 {
     ////WiFi.mode(WIFI_STA);
-    WiFi.begin(wifiSSID, wifiPassword);
-    Debug("connecting to: " + String(wifiSSID), true, false);
+    WiFi.begin(configurationDoc["wifi"]["wifiSSID"].as<String>().c_str(), configurationDoc["wifi"]["wifiPassword"].as<String>().c_str());
+    Debug("connecting to: " + configurationDoc["wifi"]["wifiSSID"].as<String>(), true, false);
 
     int Wifiattempts = 0;
     while (WiFi.status() != WL_CONNECTED)
@@ -78,15 +40,15 @@ void ArduinoRedWifi::WifiConnect() const
         ++Wifiattempts;
         if (Wifiattempts > 120) //60 sec
         {
-            Debug(" can't connect, reseting...", false);
+            Debug(" can't connect to WiFi, restarting");
             ESP.restart();
         }
     }
     Debug("connected", false);
-    Debug("local IP address: " + WiFi.localIP().toString() + ", host name: " + deviceName);
+    Debug("local IP address: " + WiFi.localIP().toString() + ", host name: " + configurationDoc["device"]["deviceName"].as<String>());
 
     Debug("RSSI: " + String(WiFi.RSSI()) + "dBm");
 
-    if (!MDNS.begin(deviceName))
+    if (!MDNS.begin(configurationDoc["device"]["deviceName"].as<String>().c_str()))
         Debug("Error setting up MDNS responder!");
 }

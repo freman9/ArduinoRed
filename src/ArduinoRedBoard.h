@@ -22,8 +22,6 @@ public:
 protected:
     ArduinoRedBoard();
 
-    std::function<String(String, String)> getClientConfigurationDocCallback;
-
     std::function<void(const char *, const char *)> mqttPublishCallback;
 
     void setup() const;

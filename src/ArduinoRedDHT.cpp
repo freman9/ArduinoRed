@@ -4,7 +4,7 @@
 extern void Debug(String DebugLine, boolean addTime = true, boolean newLine = true, boolean sendToMqtt = true);
 
 //external variables
-extern const uint8_t DHTPin;
+extern StaticJsonDocument<1024> configurationDoc;
 
 //own variables
 
@@ -14,17 +14,17 @@ ArduinoRedDHT::ArduinoRedDHT()
     lastDhtRefresh = 0;
     oldTemperature = 0;
     oldHumidity = 0;
-    diffTemperature = 0.2;
-    diffHumidity = 0.5;
-    DHTRefreshLag_sec = 5;
 }
 
 void ArduinoRedDHT::setup() const
 {
-    topicThermostat = getClientConfigurationDocCallback("client", "name") + "/thermostat/status";
+    diffTemperature = configurationDoc["dht"]["diffTemperature"].as<float>();
+    diffHumidity = configurationDoc["dht"]["diffHumidity"].as<float>();
+    DHTRefreshLag_sec = configurationDoc["dht"]["DHTRefreshLag_sec"].as<int>();
 
-    setDHTConfig();
-    dht.setup(DHTPin, DHTesp::DHTTYPE);
+    topicThermostat = configurationDoc["device"]["deviceName"].as<String>() + "/thermostat/status";
+
+    dht.setup(configurationDoc["dht"]["DHTPin"].as<uint8_t>(), DHTesp::DHTTYPE);
     Debug("DHT config: DHTRefreshLag_sec: " + String(DHTRefreshLag_sec) +
           " diffTemperature: " + String(diffTemperature) +
           " diffHumidity: " + String(diffHumidity));
@@ -36,18 +36,11 @@ void ArduinoRedDHT::loop() const
     if (now - lastDhtRefresh > DHTRefreshLag_sec * 1000)
     {
         lastDhtRefresh = now;
-        RefreshDHT();
+        RefreshDHT(false);
     }
 }
 
-void ArduinoRedDHT::setDHTConfig() const
-{
-    DHTRefreshLag_sec = atoi(getClientConfigurationDocCallback("dht", "refreshLag_sec").c_str());
-    diffTemperature = atof(getClientConfigurationDocCallback("dht", "diffTemperature").c_str());
-    diffHumidity = atof(getClientConfigurationDocCallback("dht", "diffHumidity").c_str());
-}
-
-void ArduinoRedDHT::RefreshDHT() const
+void ArduinoRedDHT::RefreshDHT(boolean forceDHTUpdate) const
 {
     StaticJsonDocument<100> thermostatDoc;
     String jsonDHTString;
@@ -68,8 +61,9 @@ void ArduinoRedDHT::RefreshDHT() const
     float temperature = newValues.temperature;
     float humidity = newValues.humidity;
 
-    if ((abs(temperature - oldTemperature) < diffTemperature) && (abs(humidity - oldHumidity) < diffHumidity))
-        return;
+    if (!forceDHTUpdate)
+        if ((abs(temperature - oldTemperature) < diffTemperature) && (abs(humidity - oldHumidity) < diffHumidity))
+            return;
 
     oldTemperature = temperature;
     oldHumidity = humidity;
@@ -85,5 +79,5 @@ void ArduinoRedDHT::RefreshDHT() const
     serializeJson(thermostatDoc, jsonDHTString);
 
     mqttPublishCallback(topicThermostat.c_str(), jsonDHTString.c_str());
-    Debug(jsonDHTString.c_str()); ////
+    ////Debug(jsonDHTString.c_str()); ////
 }

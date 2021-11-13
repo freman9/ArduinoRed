@@ -2,6 +2,7 @@
 #define ArduinoRedOTA_h
 
 //OTA
+#include <ArduinoJson.h>
 #include <ArduinoOTA.h>
 
 class ArduinoRedOTA

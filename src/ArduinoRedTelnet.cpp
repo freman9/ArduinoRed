@@ -19,14 +19,18 @@ void ArduinoRedTelnet::loop() const
     switch (TelnetStream.read())
     {
     case 'R':
-        Debug("reseting from telnet");
-        TelnetStream.stop();
+        Debug("restarting from telnet");
+        ////TelnetStream.stop();
         delay(100);
         ESP.restart();
         break;
     case 'P':
         Debug("telnet Ping");
-        TelnetStream.println("Pong");
+        TelnetStream.println("telnet Pong");
+        break;
+    case 'T':
+        Debug("force thermostat data update");
+        RefreshDHTCallback(true);
         break;
     }
 }

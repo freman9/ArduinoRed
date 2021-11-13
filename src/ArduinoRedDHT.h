@@ -1,9 +1,9 @@
 #ifndef ArduinoRedDHT_h
 #define ArduinoRedDHT_h
 
-#include <DHTesp.h>
 #include <ArduinoJson.h>
 #include <functional>
+#include <DHTesp.h>
 
 class ArduinoRedDHT
 {
@@ -13,27 +13,26 @@ private:
 
     mutable long lastDhtRefresh;
     mutable float oldTemperature, oldHumidity;
-    mutable float diffTemperature, diffHumidity;
+
+    mutable float diffTemperature;
+    mutable float diffHumidity;
     mutable int DHTRefreshLag_sec;
 
     mutable String topicThermostat;
 
 public:
+    std::function<void(const char *, const char *)> mqttPublishCallback;
+
 protected:
     ArduinoRedDHT();
 
-    std::function<String(String, String)> getClientConfigurationDocCallback;
-
-    std::function<void(const char *, const char *)> mqttPublishCallback;
+    void RefreshDHT(boolean forceDHTUpdate) const;
 
     void setup() const;
 
     void loop() const;
 
 private:
-    void setDHTConfig() const;
-
-    void RefreshDHT() const;
 };
 
 #endif

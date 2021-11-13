@@ -1,9 +1,9 @@
 #ifndef ArduinoRedMqttClient_h
 #define ArduinoRedMqttClient_h
 
-#include <PubSubClient.h>
 #include <ArduinoJson.h>
 #include <functional>
+#include <PubSubClient.h>
 #include <ArduinoRedUtils.h>
 
 #ifdef ESP32
@@ -11,7 +11,6 @@
 #endif
 #ifdef ESP8266
 #include <ESP8266WiFi.h>
-#include <ESP8266HTTPClient.h>
 #endif
 
 class ArduinoRedMqttClient : private ArduinoRedUtils
@@ -20,12 +19,6 @@ private:
     const boolean retained = true;
     const boolean willRetain = false;
     const byte willQoS = 1;
-
-    mutable String clientName;
-    mutable String mqttServer;
-    mutable uint16_t mqttPort;
-    mutable String mqttUser;
-    mutable String mqttPassword;
 
     mutable String topicStatus;
     mutable String topicDebug;
@@ -46,11 +39,7 @@ public:
 
     void addtoDebugBuff(String debugString) const;
 
-    void updateClientConfigurationDoc(String clientConfiguration) const;
-
     void mqttPublish(const char *topic, const char *payload) const;
-
-    String getClientConfigurationDoc(String first, String second) const;
 
 protected:
     ArduinoRedMqttClient();

@@ -4,12 +4,11 @@
 extern void Debug(String DebugLine, boolean addTime = true, boolean newLine = true, boolean sendToMqtt = true);
 
 //external variables
-extern uint16_t irTransmiterPin;
-extern uint16_t irReceiverPin;
+extern StaticJsonDocument<1024> configurationDoc;
 
 //own variables
-IRsend irTransmiter(irTransmiterPin);
-IRrecv irRecviver(irReceiverPin);
+IRsend irTransmiter(configurationDoc["ir"]["irTransmiterPin"].as<uint16_t>());
+IRrecv irRecviver(configurationDoc["ir"]["irReceiverPin"].as<uint16_t>());
 
 //methods
 ArduinoRedIR::ArduinoRedIR() {}
@@ -21,8 +20,8 @@ void ArduinoRedIR::setup() const
     Debug("starting IR transmiter");
     irTransmiter.begin();
 
-    topicRemoteRecivedCode = getClientConfigurationDocCallback("client", "name") + "/remote/recivedCode";
-    topicRemote = getClientConfigurationDocCallback("client", "name") + "/remote";
+    topicRemoteRecivedCode = configurationDoc["device"]["deviceName"].as<String>() + "/remote/recivedCode";
+    topicRemote = configurationDoc["device"]["deviceName"].as<String>() + "/remote";
 
     remoteLearningMode = false;
     mqttPublishCallback(topicRemote.c_str(), ArduinoRedUtils::SimpleJsonGenerator("mode", "normal").c_str());

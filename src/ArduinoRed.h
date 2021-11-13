@@ -1,12 +1,12 @@
 #ifndef ArduinoRed_h
 #define ArduinoRed_h
 
+#include <ArduinoJson.h>
+
 //external variables
-extern const bool serialDebug;
-extern const bool telnetDebug;
-extern const bool mqttDebug;
 
 //own variables
+StaticJsonDocument<1024> configurationDoc;
 
 //methods
 void Debug(String DebugLine, boolean addTime = true, boolean newLine = true, boolean sendToMqtt = true);
@@ -31,14 +31,16 @@ class ArduinoRed : public ArduinoRedNtp,
                    public ArduinoRedMqttClient,
                    private ArduinoRedWifi,
                    private ArduinoRedBoard,
+
 #ifdef DHTfunctionality
                    private ArduinoRedDHT,
 #endif
+
 #ifdef IRfunctionality
                    private ArduinoRedIR,
 #endif
-                   private ArduinoRedOTA
 
+                   private ArduinoRedOTA
 {
 private:
 public:
@@ -53,10 +55,10 @@ public:
         {
                 Debug("*** statrtup script started ***");
 
-                ArduinoRedWifi::updateClientConfigurationDocCallback = [this](String clientConfiguration)
-                { ArduinoRedMqttClient::updateClientConfigurationDoc(clientConfiguration); };
                 ArduinoRedWifi::setup();
 
+                ArduinoRedTelnet::RefreshDHTCallback = [this](boolean forceDHTUpdate)
+                { ArduinoRedDHT::RefreshDHT(forceDHTUpdate); };
                 ArduinoRedTelnet::setup();
 
                 ArduinoRedNtp::setup();
@@ -65,25 +67,22 @@ public:
                 ArduinoRedOTA::setup();
 #endif
 
-                ArduinoRedWifi::getArduinoRedConfiguration();
+                ArduinoRedMqttClient::setup();
 
                 ArduinoRedMqttClient::boardCommandCallback = [this](String payloadStr)
                 { ArduinoRedBoard::boardCallback(payloadStr); };
                 ArduinoRedMqttClient::getEspMemStatusCallback = [this]()
                 { ArduinoRed::getEspMemStatus(); };
-                ArduinoRedMqttClient::setup();
 
                 ArduinoRedBoard::mqttPublishCallback = [this](const char *topic, const char *payload)
                 { ArduinoRedMqttClient::mqttPublish(topic, payload); };
-                ArduinoRedBoard::getClientConfigurationDocCallback = [this](String first, String second)
-                { return ArduinoRedMqttClient::getClientConfigurationDoc(first, second); };
+
                 ArduinoRedBoard::setup();
 
 #ifdef DHTfunctionality
                 ArduinoRedDHT::mqttPublishCallback = [this](const char *topic, const char *payload)
                 { ArduinoRedMqttClient::mqttPublish(topic, payload); };
-                ArduinoRedDHT::getClientConfigurationDocCallback = [this](String first, String second)
-                { return ArduinoRedMqttClient::getClientConfigurationDoc(first, second); };
+
                 ArduinoRedDHT::setup();
 #endif
 
@@ -95,12 +94,11 @@ public:
 
                 ArduinoRedIR::mqttPublishCallback = [this](const char *topic, const char *payload)
                 { ArduinoRedMqttClient::mqttPublish(topic, payload); };
-                ArduinoRedIR::getClientConfigurationDocCallback = [this](String first, String second)
-                { return ArduinoRedMqttClient::getClientConfigurationDoc(first, second); };
+
                 ArduinoRedIR::setup();
 #endif
 
-                ArduinoRed::getEspMemStatus();
+                ////ArduinoRed::getEspMemStatus();
 
                 Debug("*** statrtup script finished ***");
         }
@@ -174,15 +172,15 @@ void Debug(String DebugLine, boolean addTime, boolean newLine, boolean sendToMqt
                 DebugString += '\n';
 
         //send to Serial
-        if (serialDebug)
+        if (configurationDoc["debug"]["serialDebug"].as<boolean>())
                 Serial.print(DebugString);
 
         //send to telnet
-        if (telnetDebug)
+        if (configurationDoc["debug"]["telnetDebug"].as<boolean>())
                 TelnetStream.print(DebugString);
 
         //send to MQTT
-        if ((mqttDebug) && (sendToMqtt))
+        if ((configurationDoc["debug"]["mqttDebug"].as<boolean>()) && (sendToMqtt))
                 arduinoRed.ArduinoRedMqttClient::addtoDebugBuff(DebugString);
 }
 
