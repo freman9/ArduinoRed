@@ -92,6 +92,7 @@ void ArduinoRedMqttClient::pubSubClientSubscribe() const
         pubSubClient.subscribe(topicRemoteTransmitCode.c_str(), 1);
     }
 
+    Debug("additional topics:");
     for (uint16_t i = 0; i < configurationDoc["topics"].size(); i++)
     {
         String topicTemp = configurationDoc["device"]["deviceName"].as<String>() + "/" + configurationDoc["topics"][i]["topic"].as<String>();
@@ -261,11 +262,13 @@ void ArduinoRedMqttClient::flushDebugToPubSubClient() const
     if ((pubSubClientDebugBuffer != "") && (pubSubClientDebugState))
     {
         int lineBreakPos = pubSubClientDebugBuffer.indexOf('\n');
+        int maxMqttMsgLength = (256 - topicDebug.length() - 20); //20 for margin
 
         if (lineBreakPos == -1)
-            lineBreakPos = pubSubClientDebugBuffer.length(); //todo: not 100 but max mqtt topic+msg length
-        if (lineBreakPos > 100)
-            lineBreakPos = 100;
+            lineBreakPos = pubSubClientDebugBuffer.length();
+
+        if (lineBreakPos > maxMqttMsgLength)
+            lineBreakPos = maxMqttMsgLength;
 
         String pubSubClientDebugBufferLine = pubSubClientDebugBuffer.substring(0, lineBreakPos + 1);
 

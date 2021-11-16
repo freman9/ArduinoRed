@@ -16,8 +16,7 @@
 class ArduinoRedMqttClient : private ArduinoRedUtils
 {
 private:
-    const boolean retained = true;
-    const boolean willRetain = false;
+    const boolean willRetain = true;
     const byte willQoS = 1;
 
     mutable String topicStatus;
