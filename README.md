@@ -6,116 +6,66 @@ main.cpp
 ---------
 #include <Arduino.h>
 
-
-//Configure ArduinoRed
-
-const char *deviceName="ESP32D1";
-
-const char *arduinoRedCode="passkey";//for verification in node-red
-
-const char *nodeRedURL="...noderedurl..."; //(without http/s)
-
-
-//WiFi
-
-const char *wifiSSID = "ssid";
-
-const char *wifiPassword = "pass";
-
-
 //DHT
-
-#define DHTfunctionality //comment if functionality is not needed
-
-extern const uint8_t DHTPin = 17;
-
+#define DHTfunctionality
 
 //IR
-
-#define IRfunctionality //comment if functionality is not needed
-
-extern const uint16_t irTransmiterPin = 4;
-
-extern const uint16_t irReceiverPin = 14;
-
+//#define IRfunctionality
 
 #include <ArduinoRed.h>
 
-
 void setup()
-
 {
-
   Serial.begin(115200);
-  
+
+  //Device
+  configurationDoc["device"]["deviceName"] = "aaa";
+  configurationDoc["device"]["arduinoRedCode"] = "aaa";
+
+  //WiFi
+  configurationDoc["wifi"]["wifiSSID"] = "aaa";
+  configurationDoc["wifi"]["wifiPassword"] = "aaa";
+
+  //MQTT
+  configurationDoc["mqtt"]["mqttServer"] = "aaa";
+  configurationDoc["mqtt"]["mqttPort"] = aaa;
+  configurationDoc["mqtt"]["mqttUser"] = "aaa";
+  configurationDoc["mqtt"]["mqttPassword"] = "aaa";
+
+  //Debug
+  configurationDoc["debug"]["serialDebug"] = true;
+  configurationDoc["debug"]["telnetDebug"] = true;
+  configurationDoc["debug"]["mqttDebug"] = true;
+
+  //DHT
+  configurationDoc["dht"]["diffTemperature"] = 0.2;
+  configurationDoc["dht"]["diffHumidity"] = 0.5;
+  configurationDoc["dht"]["DHTRefreshLag_sec"] = 5;
+  configurationDoc["dht"]["DHTPin"] = 14;
+
+  //OR
+  configurationDoc["ir"]["irTransmiterPin"] = 4;
+  configurationDoc["ir"]["irReceiverPin"] = 17;
+
+  //Topics
+  configurationDoc["topics"][0]["topic"] = "foli";
+  configurationDoc["topics"][0]["qos"] = 0;
+  configurationDoc["topics"][0]["subscribe"] = true;
+
   arduinoRed.setup();
-  
 }
 
 void loop()
-
 {
-
   arduinoRed.loop();
-  
 }
+
 
 
 Node-Red
 --------
-The ESP devices needs to get the mqtt broker and additional parameters from node-red
+The ESPxx communicates with node red via MQTT.
 
-(you have to set node-red before turning on the ESP)
-
-instructions:
-
-create "http in" node with url "/devicename" (i.e. /ESP32D1) and respond with json object:
-
-"{
-
-  "server":
-  
-    {
-    
-      "url":"mqtt broker url",
-      
-     "port":mqtt port,
-     
-     "user":"mqtt user",
-     
-     "password":"mqtt password"
-     
-     },
-     
-  "dht":
-  
-    {
-    
-      "refreshLag_sec":5,         //dht refresh time in seconds
-      
-      "diffTemperature":0.2,  //min delta temperature to update thermostat data
-      
-      "diffHumidity":0.5      //min delta humidity to update thermostat data
-      
-    },
-    
-   "topics":                  //optional - you can define multiple topics for the ESP to subscribe
-   
-      [{"topic":"test","qos":1,"subscribe":true}],
-      
-   "client":
-   
-   {
-   
-    "name":"ESP32D1"
-    
-   }
-   
- }"
- 
-the client name should match the one typed in the main.cpp.
-
-send the json object to "http response" node.
 
 Device status
 -------------
@@ -160,5 +110,5 @@ subscribe to topic ["device name"/board/pinValues] to get pins values (which you
 
 General notes
 -------------
-message sent to the device should not be greater than 122 characters (topic + payload length) [pubsubclient library limitation]
-the same for message sent from the device, this is the reasone for spliting pronto code messages
+message sent to device should not be greater than 256 characters (topic + payload length) [pubsubclient library limitation]
+the same for message sent from the device.
