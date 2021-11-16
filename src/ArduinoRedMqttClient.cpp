@@ -50,7 +50,10 @@ void ArduinoRedMqttClient::setup() const
 
     mqttServerConnect();
 
-    mqttPublish("ESP32D1/status/setup", "{\"key\":\"2009\"}"); ////
+    //send authentication key to Node-RED
+    String arduinoRedKeyJson = "{\"key\":\"" + configurationDoc["device"]["arduinoRedCode"].as<String>() + "\"}";
+    String arduinoRedKeyPath = topicStatus + "/setup";
+    mqttPublish(arduinoRedKeyPath.c_str(), arduinoRedKeyJson.c_str());
 }
 
 void ArduinoRedMqttClient::loop() const
