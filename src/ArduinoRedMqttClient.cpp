@@ -31,13 +31,14 @@ void ArduinoRedMqttClient::setup() const
 #endif
 
     const char *foli = configurationDoc["mqtt"]["mqttServer"]; ////
-    //Debug(foli);                                               ////
-
+    //Debug(foli);                                             ////
     pubSubClient.setServer(foli, configurationDoc["mqtt"]["mqttPort"].as<uint16_t>());
 
     topicStatus = configurationDoc["device"]["deviceName"].as<String>() + "/status";
+
     topicDebug = configurationDoc["device"]["deviceName"].as<String>() + "/debug";
     topicBoard = configurationDoc["device"]["deviceName"].as<String>() + "/board";
+    topicCmd = configurationDoc["device"]["deviceName"].as<String>() + "/cmd";
 
     if (IRfunctionalityState)
     {
@@ -51,9 +52,9 @@ void ArduinoRedMqttClient::setup() const
     mqttServerConnect();
 
     //send authentication key to Node-RED
-    String arduinoRedKeyJson = "{\"key\":\"" + configurationDoc["device"]["arduinoRedCode"].as<String>() + "\"}";
-    String arduinoRedKeyPath = topicStatus + "/setup";
-    mqttPublish(arduinoRedKeyPath.c_str(), arduinoRedKeyJson.c_str());
+    String arduinoRedKeyJson = "{\"key\":\"" + configurationDoc["device"]["arduinoRedCode"].as<String>() + "\"}"; ////
+    String arduinoRedKeyPath = topicStatus + "/setup";                                                            ////
+    mqttPublish(arduinoRedKeyPath.c_str(), arduinoRedKeyJson.c_str());                                            ////
 }
 
 void ArduinoRedMqttClient::loop() const
@@ -70,8 +71,8 @@ void ArduinoRedMqttClient::mqttPublish(const char *topic, const char *payload) c
 {
     size_t totalMqttMessageLength = strlen(topic) + strlen(payload);
 
-    if (totalMqttMessageLength > 122)
-        Debug("mqttpublish error, topic: " + String(topic) + ", total topic+msg length > 122: " + String(totalMqttMessageLength));
+    if (totalMqttMessageLength > maxMqttMsgLengthLimit)
+        Debug("mqttpublish error, topic: " + String(topic) + ", total topic+msg length > " + String(maxMqttMsgLengthLimit) + ": " + String(totalMqttMessageLength));
 
     pubSubClient.publish(topic, payload);
 }
@@ -81,18 +82,20 @@ void ArduinoRedMqttClient::addtoDebugBuff(String debugString) const
     pubSubClientDebugBuffer += debugString;
 
     if (pubSubClientDebugBuffer.length() > pubSubClientDebugBufferLimit)
-        pubSubClientDebugBuffer = "... " + pubSubClientDebugBuffer.substring(pubSubClientDebugBuffer.length() - 1000, pubSubClientDebugBuffer.length());
+        pubSubClientDebugBuffer = "... " + pubSubClientDebugBuffer.substring(pubSubClientDebugBuffer.length() - (pubSubClientDebugBufferLimit - 5), pubSubClientDebugBuffer.length());
 }
 
 void ArduinoRedMqttClient::pubSubClientSubscribe() const
 {
-    pubSubClient.subscribe(topicStatus.c_str(), 1);
-    pubSubClient.subscribe(topicBoard.c_str(), 1);
+    pubSubClient.subscribe(topicStatus.c_str(), 0);
+    pubSubClient.subscribe(topicBoard.c_str(), 0);
+
+    pubSubClient.subscribe(topicCmd.c_str(), 0);
 
     if (IRfunctionalityState)
     {
-        pubSubClient.subscribe(topicRemote.c_str(), 1);
-        pubSubClient.subscribe(topicRemoteTransmitCode.c_str(), 1);
+        pubSubClient.subscribe(topicRemote.c_str(), 0);
+        pubSubClient.subscribe(topicRemoteTransmitCode.c_str(), 0);
     }
 
     Debug("additional topics:");
@@ -115,63 +118,85 @@ void ArduinoRedMqttClient::pubSubClientCallback(char *topic, uint8_t *payload, u
     for (unsigned int i = 0; i < length; i++)
         payloadStr += (char)payload[i];
 
-    boolean filteredTopic = false;
-    if (strcmp(topic, topicRemoteTransmitCode.c_str()) == 0) //filter debug of topicRemoteTransmitCode messages
+    if (configurationDoc["debug"]["debugMqttReciveMsg"].as<boolean>())
+        Debug("[mqtt] topic: " + String(topic) + ", payload: " + payloadStr);
+    /*
+    //topic: /remote/transmitCode
+    if (ArduinoRedUtils::cmpStr(topic, topicRemoteTransmitCode.c_str())) //filter debug of topicRemoteTransmitCode messages
         filteredTopic = true;
-    /*if (strcmp(topic, topicBoard.c_str()) == 0) //filter debug of topicBoard messages
+    */
+
+    //topic: /board
+    /*if (ArduinoRedUtils::cmpStr(topic, topicBoard.c_str())) //filter debug of topicBoard messages
         filteredTopic = true;*/
 
-    if (!filteredTopic)
-        Debug("[mqtt] topic: " + String(topic) + ", payload: " + payloadStr);
-
-    //status, debug & reset
-    if (strcmp(topic, topicStatus.c_str()) == 0)
+    //topic: /cmd
+    if (ArduinoRedUtils::cmpStr(topic, topicCmd.c_str()))
     {
-        if (strcmp(payloadStr.c_str(), "sync") == 0)
+        //dhtForceUpdate
+        if (ArduinoRedUtils::cmpStr(payloadStr.c_str(), "dhtForceUpdate"))
+        {
+            Debug("dhtForceUpdate");
+            refreshDHTCallback(true);
+        }
+    }
+
+    //topic: /status
+    if (ArduinoRedUtils::cmpStr(topic, topicStatus.c_str()))
+    {
+        //sync
+        if (ArduinoRedUtils::cmpStr(payloadStr.c_str(), "sync"))
         {
             Debug(configurationDoc["device"]["deviceName"].as<String>() + ": online");
             mqttPublish(topicStatus.c_str(), (configurationDoc["device"]["deviceName"].as<String>() + ": online").c_str());
         }
 
-        if (strcmp(payloadStr.c_str(), "getEspMemStatus") == 0)
+        //getEspMemStatus
+        if (ArduinoRedUtils::cmpStr(payloadStr.c_str(), "getEspMemStatus"))
             getEspMemStatusCallback();
 
-        if (strcmp(payloadStr.c_str(), ArduinoRedUtils::SimpleJsonGenerator("debug", "start").c_str()) == 0)
+        //debug: start
+        if (ArduinoRedUtils::cmpStr(payloadStr.c_str(), ArduinoRedUtils::SimpleJsonGenerator("debug", "start").c_str()))
             pubSubClientDebugState = true;
 
-        if (strcmp(payloadStr.c_str(), ArduinoRedUtils::SimpleJsonGenerator("debug", "stop").c_str()) == 0)
+        //debug: stop
+        if (ArduinoRedUtils::cmpStr(payloadStr.c_str(), ArduinoRedUtils::SimpleJsonGenerator("debug", "stop").c_str()))
             pubSubClientDebugState = false;
 
-        if (strcmp(payloadStr.c_str(), "reset") == 0)
+        //reset
+        if (ArduinoRedUtils::cmpStr(payloadStr.c_str(), "reset"))
         {
             Debug("reseting...");
             ESP.restart();
         }
     }
 
-    //board
-    if (strcmp(topic, topicBoard.c_str()) == 0)
+    //topic: /board
+    if (ArduinoRedUtils::cmpStr(topic, topicBoard.c_str()))
         boardCommandCallback(payloadStr);
 
-    //IR
+    //topic: /remote
     if (IRfunctionalityState)
     {
-        if (strcmp(topic, topicRemote.c_str()) == 0)
+        if (ArduinoRedUtils::cmpStr(topic, topicRemote.c_str()))
         {
-            if (strcmp(payloadStr.c_str(), ArduinoRedUtils::SimpleJsonGenerator("mode", "learn").c_str()) == 0)
+            //mode: learn
+            if (ArduinoRedUtils::cmpStr(payloadStr.c_str(), ArduinoRedUtils::SimpleJsonGenerator("mode", "learn").c_str()))
                 setRemoteModeCallback(true);
 
-            if (strcmp(payloadStr.c_str(), ArduinoRedUtils::SimpleJsonGenerator("mode", "normal").c_str()) == 0)
+            //mode: normal
+            if (ArduinoRedUtils::cmpStr(payloadStr.c_str(), ArduinoRedUtils::SimpleJsonGenerator("mode", "normal").c_str()))
                 setRemoteModeCallback(false);
         }
 
-        if (strcmp(topic, topicRemoteTransmitCode.c_str()) == 0)
+        //topic: /remote/transmitCode
+        if (ArduinoRedUtils::cmpStr(topic, topicRemoteTransmitCode.c_str()))
         {
             transmitIRCodeCallback(payloadStr);
         }
     }
 
-    //Other Topics
+    //Other topics
     for (uint16_t i = 0; i < configurationDoc["topics"].size(); i++)
     {
         String topicTemp = configurationDoc["device"]["deviceName"].as<String>() + "/" + configurationDoc["topics"][i]["topic"].as<String>();
@@ -184,7 +209,7 @@ void ArduinoRedMqttClient::pubSubClientCallback(char *topic, uint8_t *payload, u
 
 void ArduinoRedMqttClient::mqttServerConnect() const
 {
-    if (!pubSubClient.connected()) ////was while not good for ded wifi
+    if (!pubSubClient.connected()) ////was while, not good for dead wifi
     {
         Debug("connecting to MQTT broker: " + configurationDoc["mqtt"]["mqttServer"].as<String>() + "...", true, false);
         String clientId = configurationDoc["device"]["deviceName"].as<String>() + "-" + String(WiFi.macAddress());
@@ -265,7 +290,7 @@ void ArduinoRedMqttClient::flushDebugToPubSubClient() const
     if ((pubSubClientDebugBuffer != "") && (pubSubClientDebugState))
     {
         int lineBreakPos = pubSubClientDebugBuffer.indexOf('\n');
-        int maxMqttMsgLength = (256 - topicDebug.length() - 20); //20 for margin
+        int maxMqttMsgLength = (maxMqttMsgLengthLimit - topicDebug.length());
 
         if (lineBreakPos == -1)
             lineBreakPos = pubSubClientDebugBuffer.length();

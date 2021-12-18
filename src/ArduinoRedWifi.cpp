@@ -44,10 +44,8 @@ void ArduinoRedWifi::WifiConnect() const
             ESP.restart();
         }
     }
-    Debug("connected", false);
+    Debug("connected, RSSI: " + String(WiFi.RSSI()) + "dBm", false);
     Debug("local IP address: " + WiFi.localIP().toString() + ", host name: " + configurationDoc["device"]["deviceName"].as<String>());
-
-    Debug("RSSI: " + String(WiFi.RSSI()) + "dBm");
 
     if (!MDNS.begin(configurationDoc["device"]["deviceName"].as<String>().c_str()))
         Debug("Error setting up MDNS responder!");

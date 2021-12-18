@@ -26,7 +26,7 @@ public:
 protected:
     ArduinoRedDHT();
 
-    void RefreshDHT(boolean forceDHTUpdate) const;
+    void refreshDHT(boolean forceDHTUpdate) const;
 
     void setup() const;
 

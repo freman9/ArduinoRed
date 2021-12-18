@@ -30,7 +30,10 @@ void ArduinoRedTelnet::loop() const
         break;
     case 'T':
         Debug("force thermostat data update");
-        RefreshDHTCallback(true);
+        refreshDHTCallback(true);
+        break;
+    case 'W':
+        Debug("Todo bom");
         break;
     }
 }

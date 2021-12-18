@@ -14,6 +14,8 @@ protected:
 
     String SimpleJsonGenerator(String element, int value) const;
 
+    boolean cmpStr(const char *str1, const char *str2) const;
+
 private:
 };
 

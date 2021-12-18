@@ -57,8 +57,8 @@ public:
 
                 ArduinoRedWifi::setup();
 
-                ArduinoRedTelnet::RefreshDHTCallback = [this](boolean forceDHTUpdate)
-                { ArduinoRedDHT::RefreshDHT(forceDHTUpdate); };
+                ArduinoRedTelnet::refreshDHTCallback = [this](boolean forceDHTUpdate)
+                { ArduinoRedDHT::refreshDHT(forceDHTUpdate); };
                 ArduinoRedTelnet::setup();
 
                 ArduinoRedNtp::setup();
@@ -67,22 +67,21 @@ public:
                 ArduinoRedOTA::setup();
 #endif
 
-                ArduinoRedMqttClient::setup();
-
+                ArduinoRedMqttClient::refreshDHTCallback = [this](boolean forceDHTUpdate)
+                { ArduinoRedDHT::refreshDHT(forceDHTUpdate); };
                 ArduinoRedMqttClient::boardCommandCallback = [this](String payloadStr)
                 { ArduinoRedBoard::boardCallback(payloadStr); };
                 ArduinoRedMqttClient::getEspMemStatusCallback = [this]()
                 { ArduinoRed::getEspMemStatus(); };
-
                 ArduinoRedBoard::mqttPublishCallback = [this](const char *topic, const char *payload)
                 { ArduinoRedMqttClient::mqttPublish(topic, payload); };
+                ArduinoRedMqttClient::setup();
 
                 ArduinoRedBoard::setup();
 
 #ifdef DHTfunctionality
                 ArduinoRedDHT::mqttPublishCallback = [this](const char *topic, const char *payload)
                 { ArduinoRedMqttClient::mqttPublish(topic, payload); };
-
                 ArduinoRedDHT::setup();
 #endif
 
@@ -91,10 +90,8 @@ public:
                 { ArduinoRedIR::remoteLearningMode = state; };
                 ArduinoRedMqttClient::transmitIRCodeCallback = [this](String code)
                 { ArduinoRedIR::transmitIRCode(code); };
-
                 ArduinoRedIR::mqttPublishCallback = [this](const char *topic, const char *payload)
                 { ArduinoRedMqttClient::mqttPublish(topic, payload); };
-
                 ArduinoRedIR::setup();
 #endif
 
@@ -175,7 +172,7 @@ void Debug(String DebugLine, boolean addTime, boolean newLine, boolean sendToMqt
         if (configurationDoc["debug"]["serialDebug"].as<boolean>())
                 Serial.print(DebugString);
 
-        //send to telnet
+        //send to Telnet
         if (configurationDoc["debug"]["telnetDebug"].as<boolean>())
                 TelnetStream.print(DebugString);
 

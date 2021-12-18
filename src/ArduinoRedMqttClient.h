@@ -16,12 +16,15 @@
 class ArduinoRedMqttClient : private ArduinoRedUtils
 {
 private:
-    const boolean willRetain = true;
+    const boolean willRetain = false;
     const byte willQoS = 1;
+
+    const int maxMqttMsgLengthLimit = 240; //256 according to pubsubclient doc, dec 20 for header
 
     mutable String topicStatus;
     mutable String topicDebug;
     mutable String topicBoard;
+    mutable String topicCmd;
 
     //if (IRfunctionalityState){
     mutable String topicRemote = "null";             ////
@@ -30,7 +33,7 @@ private:
 
     //mqttDebug
     const int pubSubClientDebugBufferLimit = 1005; ////
-    mutable boolean pubSubClientDebugState = false;
+    mutable boolean pubSubClientDebugState = true;
     mutable String pubSubClientDebugBuffer;
 
 public:
@@ -42,6 +45,8 @@ public:
 
 protected:
     ArduinoRedMqttClient();
+
+    std::function<void(boolean)> refreshDHTCallback;
 
     std::function<void(String)> boardCommandCallback;
 

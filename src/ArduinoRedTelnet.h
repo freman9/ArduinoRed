@@ -11,7 +11,7 @@ public:
 protected:
     ArduinoRedTelnet();
 
-    std::function<void(boolean)> RefreshDHTCallback;
+    std::function<void(boolean)> refreshDHTCallback;
 
     void setup() const;
 

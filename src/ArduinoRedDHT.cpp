@@ -34,14 +34,13 @@ void ArduinoRedDHT::loop() const
 {
     long now = millis();
     if (now - lastDhtRefresh > DHTRefreshLag_sec * 1000)
-    {
-        lastDhtRefresh = now;
-        RefreshDHT(false);
-    }
+        refreshDHT(false);
 }
 
-void ArduinoRedDHT::RefreshDHT(boolean forceDHTUpdate) const
+void ArduinoRedDHT::refreshDHT(boolean forceDHTUpdate) const
 {
+    lastDhtRefresh = millis();
+
     StaticJsonDocument<100> thermostatDoc;
     String jsonDHTString;
 
@@ -76,8 +75,8 @@ void ArduinoRedDHT::RefreshDHT(boolean forceDHTUpdate) const
     thermostatDoc["humidity"] = String(humidity, 1);
     thermostatDoc["heatIndex"] = String(heatIndex, 1);
     thermostatDoc["dewPoint"] = String(dewPoint, 1);
+
     serializeJson(thermostatDoc, jsonDHTString);
 
     mqttPublishCallback(topicThermostat.c_str(), jsonDHTString.c_str());
-    ////Debug(jsonDHTString.c_str()); ////
 }
